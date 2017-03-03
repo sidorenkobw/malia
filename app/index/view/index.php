@@ -1,6 +1,6 @@
 <div class="jumbotron">
     <h1>Malia Speech</h1>
-    <p class="lead">Malia peech project is an app developed on a TOM:Berkeley 2017 event for helping people with disabilities to be understood by other people.</p>
+    <p class="lead">Malia speech is an app developed on a TOM:Berkeley 2017 event for helping people with disabilities to be understood by other people.</p>
     <p>
         <a class="btn btn-lg btn-success" href="/learn.php" role="button">Start Learning <span class="glyphicon glyphicon-education" aria-hidden="true"></span></a>
         <a class="btn btn-lg btn-primary" href="#speak" role="button">Start Speaking <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span></a>
