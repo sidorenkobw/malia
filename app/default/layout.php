@@ -58,7 +58,7 @@ $menu = array(
             </ul>
         </nav>
         
-        <h3 class="text-muted">Malia Project</h3>
+        <h3 class="text-muted">Malia Speech</h3>
     </div>
 
     <?php echo $this->contents ?>
