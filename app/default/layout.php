@@ -17,6 +17,7 @@
     
     <!-- Bootstrap -->
     <link href="<?php echo $this->cfg['libs']['bootsrap_css'] ?>" rel="stylesheet">
+    <link href="/css/jumbotron-narrow.css" rel="stylesheet">
     
     <?php echo $this->head_css ?>
     
@@ -31,9 +32,31 @@
     <?php echo $this->head_end ?>
 </head>
 <body>
+
 <?php echo $this->body_start ?>
 
-<?php echo $this->contents ?>
+    <div class="container">
+      <div class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation" class="active"><a href="/">Home</a></li>
+            <li role="presentation"><a href="#login">Login</a></li>
+            <li role="presentation"><a href="#about">About</a></li>
+            <li role="presentation"><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">Malia Project</h3>
+      </div>
+
+      <?php echo $this->contents ?>
+      
+
+      <footer class="footer">
+        <p>&copy; 2017 Malia</p>
+      </footer>
+
+    </div> <!-- /container -->
+
 
 <?php echo $this->body_before_scripts ?>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
