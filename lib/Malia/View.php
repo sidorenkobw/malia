@@ -57,6 +57,11 @@ class Malia_View
         unset($this->$name);
     }
     
+    public function escape($val)
+    {
+        return htmlspecialchars($val);
+    }
+    
     public function render()
     {
         ob_start();

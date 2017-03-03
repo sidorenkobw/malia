@@ -18,6 +18,7 @@
     <!-- Bootstrap -->
     <link href="<?php echo $this->cfg['libs']['bootsrap_css'] ?>" rel="stylesheet">
     <link href="/css/jumbotron-narrow.css" rel="stylesheet">
+    <link href="/css/malia.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
     
     <?php echo $this->head_css ?>
     
@@ -35,32 +36,45 @@
 
 <?php echo $this->body_start ?>
 
-    <div class="container">
-      <div class="header clearfix">
+<?php
+$menu = array(
+    'home' => array('title' => 'Home', 'url' => '/'),
+    'login' => array('title' => 'Login', 'url' => '#login'),
+    'learn' => array('title' => 'Learn', 'url' => '/learn.php'),
+    'about' => array('title' => 'About', 'url' => '#about'),
+    'contact' => array('title' => 'Contact', 'url' => '#contact')
+);
+?>
+
+<div class="container">
+    <div class="header clearfix">
         <nav>
-          <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="active"><a href="/">Home</a></li>
-            <li role="presentation"><a href="#login">Login</a></li>
-            <li role="presentation"><a href="#about">About</a></li>
-            <li role="presentation"><a href="#contact">Contact</a></li>
-          </ul>
+            <ul class="nav nav-pills pull-right">
+                <?php foreach ($menu as $module => $item): ?>
+                    <li role="presentation"<?php echo ($module == $this->currentModule ? ' class="active"' : '') ?>>
+                        <a href="<?php echo $this->escape($item['url']) ?>"><?php echo $this->escape($item['title']) ?></a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
         </nav>
+        
         <h3 class="text-muted">Malia Project</h3>
-      </div>
+    </div>
 
-      <?php echo $this->contents ?>
-      
+    <?php echo $this->contents ?>
 
-      <footer class="footer">
+    <footer class="footer">
         <p>&copy; 2017 Malia</p>
-      </footer>
+    </footer>
 
-    </div> <!-- /container -->
+</div> <!-- /container -->
 
 
 <?php echo $this->body_before_scripts ?>
+
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="<?php echo $this->cfg['libs']['jquery'] ?>"></script>
+
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="<?php echo $this->cfg['libs']['bootsrap_js'] ?>"></script>
 
