@@ -1,5 +1,4 @@
 class LearnView {
-    
     constructor() {
         this.isEditMode = false;
         
@@ -21,7 +20,18 @@ class LearnView {
     initEditor() {
         this.$textEditor
             .removeClass("hidden")
+            .val(this.loadTextFromStorage())
             .hide();
+            
+        this.onChangeMode();
+    }
+    
+    saveTextToStorage() {
+        localStorage.setItem("text", this.$textEditor.val());
+    }
+    
+    loadTextFromStorage() {
+        return localStorage.getItem("text");
     }
     
     initKeyboardEvents() {
@@ -61,6 +71,7 @@ class LearnView {
             this.$btnToggleRecording.prop("disabled", false);
             this.$btnRetry.prop("disabled", false);
             this.$btnNext.prop("disabled", false);
+            this.saveTextToStorage();
         }
     }
     
