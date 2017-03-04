@@ -207,10 +207,11 @@ class LearnView {
     }
     
     textToHtml(text) {
+        var mask = /([a-zA-Z]+'[a-z]+|[a-zA-Z0-9]+)/;
         text = text
-            .split(/([a-zA-Z]+'[a-z]+|[a-zA-Z]+)/)
+            .split(mask)
             .map(function (word) {
-                if (word.match(/([a-zA-Z]+'[a-z]+|[a-zA-Z]+)/)) {
+                if (word.match(mask)) {
                     word = "<span>" + $("<span>").text(word).html() + "</span>"
                 }
                 
