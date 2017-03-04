@@ -19,7 +19,7 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
             <button id="btnLearnRetry" class="btn-learn-retry btn btn-danger btn-lg">Retry Word <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></button>
         </div>
         <div class="col-md-4 col-sm-4" style="text-align: center">
-            <button id="btnLearnToggleRecording" class="btn btn-primary btn-lg">Start Recording <span class="glyphicon glyphicon-ice-lolly" aria-hidden="true"></span></button>
+            <button id="btnLearnToggleRecording" class="btn btn-primary btn-lg"><span>Start Recording</span> <span class="glyphicon glyphicon-ice-lolly" aria-hidden="true"></span></button>
         </div>
         <div class="col-md-4 col-sm-4">
             <button id="btnLearnNext" class="btn btn-success btn-lg pull-right" style="margin-left: 10px">Next Word <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span></button>
