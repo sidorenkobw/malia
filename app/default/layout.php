@@ -64,7 +64,7 @@ $menu = array(
     <?php echo $this->contents ?>
 
     <footer class="footer">
-        <p>&copy; 2017 Malia</p>
+        <p>&copy; 2017 Malia Speech</p>
     </footer>
 
 </div> <!-- /container -->
