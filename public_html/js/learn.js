@@ -4,7 +4,7 @@ class LearnView {
         
         /* idle|record|edit */
         this.mode = "idle";
-        this.currentWordIndex = 0;
+        this.activeWordIndex = 0;
         this.$words = null;
         
         this.initButtons();
@@ -121,13 +121,13 @@ class LearnView {
     
     onClickNext(e) {
         this.stopRecording();
-        this.uploadCurrentWord(this.getActiveWordEl().text());
+        this.uploadActiveWord(this.getActiveWordEl().text());
         
-        if (this.$words.length == this.currentWordIndex+1) {
+        if (this.$words.length == this.activeWordIndex+1) {
             this.setMode("idle");
             this.setActiveWord(0);
         } else {
-            this.setActiveWord(this.currentWordIndex+1)
+            this.setActiveWord(this.activeWordIndex+1)
             this.startRecording();
         }
     }
@@ -140,7 +140,7 @@ class LearnView {
 
     getActiveWordEl()
     {
-        return this.$words.eq(this.currentWordIndex);
+        return this.$words.eq(this.activeWordIndex);
     }
     
     setMode(mode) {
@@ -151,7 +151,7 @@ class LearnView {
     
     setActiveWord(index)
     {
-        this.currentWordIndex = index;
+        this.activeWordIndex = index;
         this.updateActiveWord();
     }
     
@@ -196,7 +196,7 @@ class LearnView {
         }
     }
     
-    uploadCurrentWord(word) {
+    uploadActiveWord(word) {
         console.log("Upload word: " + word)
     }
     
