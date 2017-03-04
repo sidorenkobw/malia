@@ -214,7 +214,13 @@ class LearnView {
     }
     
     textToHtml(text) {
-        var mask = /([a-zA-Z]+'[a-z]+|[a-zA-Z0-9]+)/;
+        var mask = [
+            "[a-zA-Z]+'[a-z]+", // shortened words: Don't
+            "[a-zA-Z0-9]+",     // words, numbers and words with numbers: hi 2 html5 i18n
+            "[+=*%@$&#]"        // symbols
+        ].join("|");
+        
+        var mask = new RegExp("(" + mask + ")");
         text = text
             .split(mask)
             .map(function (word) {
