@@ -45,7 +45,7 @@ class LearnView {
         this.$btnToggleRecording.click(this.onClickToggleRecording.bind(this));
         $(document).click((function(e) {
             e.preventDefault();
-            if (this.mode == "edit" && e.target !== this.$textEditor.eq(0)) {
+            if (this.mode == "edit" && e.target !== this.$textEditor.get(0)) {
                 this.setMode("idle");
             }
         }).bind(this));
