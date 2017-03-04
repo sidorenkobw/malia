@@ -8,7 +8,7 @@
 </div>
 
 <div class="row marketing">
-    <div class="col-lg-6">
+    <div class="col-sm-6">
         <h4>Learning</h4>
         <p>App can learn how you speak.</p>
 
@@ -16,7 +16,7 @@
         <p>After learning the app will be able to convert your speech to text and read it.</p>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-sm-6">
         <h4>Upload your books</h4>
         <p>You can upload your books in txt format and learn the app by reading them.</p>
 
