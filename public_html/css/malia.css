@@ -22,6 +22,10 @@
     cursor: pointer;
 }
 
+#learnTextContainer span.active {
+    border: 1px solid red;
+}
+
 .controlsPanel button {
     width: 100%;
 }
