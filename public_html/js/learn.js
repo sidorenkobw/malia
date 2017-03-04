@@ -121,7 +121,7 @@ class LearnView {
     
     onClickNext(e) {
         this.stopRecording();
-        this.uploadCurrentWord(this.$words.eq(this.currentWordIndex).text());
+        this.uploadCurrentWord(this.getActiveWordEl().text());
         
         if (this.$words.length == this.currentWordIndex+1) {
             this.setMode("idle");
@@ -138,6 +138,11 @@ class LearnView {
         this.startRecording();
     }
 
+    getActiveWordEl()
+    {
+        return this.$words.eq(this.currentWordIndex);
+    }
+    
     setMode(mode) {
         var old = this.mode;
         this.mode = mode;
@@ -237,9 +242,23 @@ class LearnView {
         this.setActiveWord(0);
     }
     
+    scrollToActiveWord()
+    {
+        var $el = this.getActiveWordEl(),
+            offsetTop = $el.offset().top - this.$textContainer.offset().top,
+            scrollTop = this.$textContainer.scrollTop(),
+            height = this.$textContainer.height();
+            
+        if ((offsetTop > height - 5) || (offsetTop < 5)) {
+            console.log("scroll")
+            this.$textContainer.animate({scrollTop: scrollTop + offsetTop - 3}, 500);
+        }
+    }
+    
     updateActiveWord() {
         this.$words.removeClass("active");
-        this.$words.eq(this.currentWordIndex).addClass("active");
+        this.getActiveWordEl().addClass("active");
+        this.scrollToActiveWord();
     }
 }
 
