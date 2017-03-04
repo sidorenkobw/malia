@@ -171,7 +171,7 @@ class LearnView {
             this.$btnToggleRecording.prop("disabled", true);
         } else {
             this.$btnToggleEdit.find("span").eq(0).text("Edit Text");
-            this.$btnToggleRecording.prop("disabled", false);
+            this.$btnToggleRecording.prop("disabled", !this.$words.length);
         }
         
         if (this.mode == "record") {
