@@ -46,8 +46,8 @@ class LearnView {
         this.$btnNext.click(this.onClickNext.bind(this));
         this.$btnRetry.click(this.onClickRetry.bind(this));
         $(document).click((function(e) {
-            e.preventDefault();
             if (this.mode == "edit" && e.target !== this.$textEditor.get(0)) {
+                e.preventDefault();
                 this.setMode("idle");
             }
         }).bind(this));
