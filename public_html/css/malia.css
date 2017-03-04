@@ -17,6 +17,11 @@
     width: 100%;
 }
 
+#learnTextContainer span {
+    border: 1px solid #efefef;
+    cursor: pointer;
+}
+
 .controlsPanel button {
     width: 100%;
 }

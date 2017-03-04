@@ -26,8 +26,8 @@ class LearnView {
         this.onChangeMode();
     }
     
-    saveTextToStorage() {
-        localStorage.setItem("text", this.$textEditor.val());
+    saveTextToStorage(text) {
+        localStorage.setItem("text", text);
     }
     
     loadTextFromStorage() {
@@ -71,7 +71,10 @@ class LearnView {
             this.$btnToggleRecording.prop("disabled", false);
             this.$btnRetry.prop("disabled", false);
             this.$btnNext.prop("disabled", false);
-            this.saveTextToStorage();
+            
+            var text = this.$textEditor.val();
+            this.saveTextToStorage(text);
+            this.updateTextContainer(text);
         }
     }
     
@@ -79,6 +82,30 @@ class LearnView {
         this.setEditMode(!this.isEditMode);
     }
     
+    textToHtml(text) {
+        text = text
+            .split(/([a-zA-Z]+'[a-z]+|[a-zA-Z]+)/)
+            .map(function (word) {
+                if (word.match(/([a-zA-Z]+'[a-z]+|[a-zA-Z]+)/)) {
+                    word = "<span>" + $("<span>").text(word).html() + "</span>"
+                }
+                
+                return word;
+            })
+            .join("")
+            .split(/\n/)
+            .join("<br>");
+
+        return text;
+    }
+    
+    updateTextContainer(text) {
+        text = this.textToHtml(text);
+        
+        this.$textContainer
+            .empty()
+            .html(text);
+    }
 }
 
 $(function () {
