@@ -6,9 +6,13 @@
     margin-bottom: 10px;
 }
 
-.textLearnPanel {
+.textPanel {
     border: 1px solid silver;
-    margin-bottom: 10px;
+    display: block;
+    font-size: 30px;
     height: 300px;
+    margin-bottom: 10px;
     overflow-y: scroll;
+    padding: 2px;
+    width: 100%;
 }
