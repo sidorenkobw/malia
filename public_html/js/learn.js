@@ -218,11 +218,12 @@ class LearnView {
         text = text
             .split(mask)
             .map(function (word) {
+                var escapedWord = $("<span>").text(word).html();
                 if (word.match(mask)) {
-                    word = "<span>" + $("<span>").text(word).html() + "</span>"
+                    escapedWord = "<span>" + escapedWord + "</span>"
                 }
                 
-                return word;
+                return escapedWord;
             })
             .join("")
             .split(/\n/)
