@@ -282,7 +282,7 @@ class LearnView {
     hideOverlay() {
         setTimeout((function () {
             this.$overlayContainer.hide();
-        }).bind(this), 500);
+        }).bind(this), 300);
     }
     
     updateActiveWord() {
