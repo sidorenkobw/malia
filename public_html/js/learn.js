@@ -63,7 +63,6 @@ class LearnView {
         }).bind(this));
     }
     
-    
     onKeyPressed(e) {
         if (e.which == 27) {
             if (this.mode != "idle") {
