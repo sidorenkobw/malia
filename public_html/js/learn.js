@@ -122,15 +122,15 @@ class LearnView extends View {
         if (this.$words.length == i) {
             this.setMode("idle");
             this.activeWordIndex = 0;
+            this.emit("active-word");
             this.showNotification("success", "End of text.");
         } else {
             this.activeWordIndex = i;
+            this.emit("active-word");
             if (this.mode == "record") {
                 this.startRecording();
             }
         }
-        
-        this.emit("active-word");
     }
     
     onKeyPressed(e) {
