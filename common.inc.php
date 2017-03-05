@@ -11,4 +11,4 @@ spl_autoload_register(function ($class_name) {
     require_once(LIB_DIR . '/' . $path . '.php');
 });
 
-require(CFG_DIR . '/base.php');
+require(CFG_DIR . '/general.php');
