@@ -1,5 +1,7 @@
-class View {
+class View extends EventEmitter {
     constructor() {
+        super();
+        
         this.$overlayContainer = $(".overlayContainer");
         this.$overlayText = $(".overlayText");
     }

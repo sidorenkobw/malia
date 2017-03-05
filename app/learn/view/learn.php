@@ -3,6 +3,7 @@
 $this->getLayout()->body_scripts .= '<script src="/lib/bootstrap-notify/js/bootstrap-notify.js?build=' . $this->cfg['build'] . '"></script>';
 $this->getLayout()->head_css .= '<link href="/lib/bootstrap-notify/css/bootstrap-notify.css?build=' . $this->cfg['build'] . '" rel="stylesheet">';
 
+$this->getLayout()->body_scripts .= '<script src="/js/event-emitter.js?build=' . $this->cfg['build'] . '"></script>';
 $this->getLayout()->body_scripts .= '<script src="/js/view.js?build=' . $this->cfg['build'] . '"></script>';
 $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->cfg['build'] . '"></script>';
 
