@@ -99,13 +99,17 @@ class LearnView extends View {
         }).bind(this));
     }
     
-    setActiveWord(index) {
+    switchActiveWord(i) {
         if (this.mode == "record") {
             // TODO if recroded file exists:
             this.stopRecording();
             this.deleteCurrentRecord();
         }
         
+        this.setActiveWord(i);
+    }
+    
+    setActiveWord(index) {
         this.activeWordIndex = index;
         this.emit("active-word");
         
@@ -150,7 +154,7 @@ class LearnView extends View {
     onClickTextContainer(e) {
         var $target = $(e.target);
         if ($target.is("span")) {
-            this.setActiveWord(this.$words.index($target));
+            this.switchActiveWord(this.$words.index($target));
         }
     }
     
@@ -205,10 +209,10 @@ class LearnView extends View {
                 .eq(0)
                 .text("Stop Recording");
             
-        this.$btnNext.focus();
-        
         this.$btnRetry.prop("disabled", false);
         this.$btnNext.prop("disabled", false);
+        
+        this.$btnNext.focus();
         
         this.startRecording();
     }
