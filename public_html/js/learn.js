@@ -259,8 +259,13 @@ class LearnView {
     
     scrollToActiveWord()
     {
-        var $el = this.getActiveWordEl(),
-            offsetTop = $el.offset().top - this.$textContainer.offset().top,
+        var $el = this.getActiveWordEl();
+        
+        if (!$el.length) {
+            return;
+        }
+        
+        var offsetTop = $el.offset().top - this.$textContainer.offset().top,
             scrollTop = this.$textContainer.scrollTop(),
             height = this.$textContainer.height();
             
