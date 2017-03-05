@@ -28,7 +28,8 @@
 
 .overlay {
     background: white;
-    outline: 2px solid #efefef;
+    outline: 2px solid white;
+    border: 2px solid #efefef;
     height: 100%;
     left: 0;
     top: 0;
