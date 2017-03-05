@@ -36,7 +36,6 @@ body {
 }
 
 .textPanel {
-    border: 1px solid silver;
     display: block;
     font-size: 30px;
     height: 300px;
