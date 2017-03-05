@@ -69,6 +69,10 @@ class LearnView {
             if (this.mode != "idle") {
                 this.setMode("idle");
             }
+            
+            if (this.isFullscreen) {
+                this.setFullscreen(false);
+            }
         }
     }
     
