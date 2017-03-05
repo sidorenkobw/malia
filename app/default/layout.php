@@ -40,7 +40,9 @@
 $menu = array(
     'home' => array('title' => 'Home', 'url' => '/'),
     'login' => array('title' => 'Login', 'url' => '#login'),
+    'signup' => array('title' => 'Sign Up', 'url' => '#signup'),
     'learn' => array('title' => 'Learn', 'url' => '/learn.php'),
+    'speak' => array('title' => 'Speak', 'url' => '#speak'),
     'about' => array('title' => 'About', 'url' => '#about'),
     'contact' => array('title' => 'Contact', 'url' => '#contact')
 );
