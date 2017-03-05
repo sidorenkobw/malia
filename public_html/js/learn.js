@@ -93,13 +93,6 @@ class LearnView extends View {
         this.$btnRetry.click(this.onClickRetry.bind(this));
         this.$btnSkip.click(this.onClickSkip.bind(this));
         this.$btnToggleFullscreen.click(this.onClickToggleFullscreen.bind(this));
-        
-        $(document).click((function(e) {
-            if (this.mode == "edit" && e.target !== this.$textEditor.get(0)) {
-                e.preventDefault();
-                this.setMode("idle");
-            }
-        }).bind(this));
     }
     
     skipActiveWord() {
@@ -297,16 +290,14 @@ class LearnView extends View {
         this.debug("Fullscreen on");
         
         this.$app.addClass("fullscreen");
-        this.$btnToggleFullscreen.addClass("btn-warning");
-        this.$btnToggleFullscreen.removeClass("btn-default");
+        this.$btnToggleFullscreen.addClass("btnChecked");
     }
     
     onFullscreenOff() {
         this.debug("Fullscreen off");
         
         this.$app.removeClass("fullscreen");
-        this.$btnToggleFullscreen.removeClass("btn-warning");
-        this.$btnToggleFullscreen.addClass("btn-default");
+        this.$btnToggleFullscreen.removeClass("btnChecked");
     }
     
     onActiveWord() {
