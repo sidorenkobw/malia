@@ -16,6 +16,15 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
 
     <div class="controlsPanel">
         <div class="row">
+            <div class="col-md-4" style="text-align: center">
+                <button id="btnFullScreen" class="btn btn-default btn-lg"><span>Full Screen</span> <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></button>
+            </div>
+            <div class="col-md-4" style="text-align: center">
+                <button id="btnLearnToggleEdit" class="btn btn-default btn-lg"><span>Edit Text</span> <span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
+            </div>
+        </div>
+        
+        <div class="row">
             <div class="col-md-4 col-sm-4">
                 <button id="btnLearnRetry" class="btn-learn-retry btn btn-danger btn-lg">Retry Word <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></button>
             </div>
@@ -24,13 +33,6 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
             </div>
             <div class="col-md-4 col-sm-4">
                 <button id="btnLearnNext" class="btn btn-success btn-lg pull-right" style="margin-left: 10px">Next Word <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span></button>
-                
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-12" style="text-align: center">
-                <button id="btnLearnToggleEdit" class="btn btn-lg"><span>Edit Text</span> <span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
             </div>
         </div>
     </div>

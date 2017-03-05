@@ -4,6 +4,7 @@ class LearnView {
         this.mode = "idle";
         this.activeWordIndex = 0;
         this.$words = null;
+        this.isFullscreen = false;
         
         this.initEls();
         this.initButtons();
@@ -24,6 +25,7 @@ class LearnView {
         this.$btnToggleRecording = $("#btnLearnToggleRecording");
         this.$btnNext = $("#btnLearnNext");
         this.$btnToggleEdit = $("#btnLearnToggleEdit");
+        this.$btnToggleFullscreen = $("#btnFullScreen");
     }
     
     initTextContainer() {
@@ -49,6 +51,8 @@ class LearnView {
         this.$btnToggleRecording.click(this.onClickToggleRecording.bind(this));
         this.$btnNext.click(this.onClickNext.bind(this));
         this.$btnRetry.click(this.onClickRetry.bind(this));
+        this.$btnToggleFullscreen.click(this.onClickToggleFullscreen.bind(this));
+        
         $(document).click((function(e) {
             if (this.mode == "edit" && e.target !== this.$textEditor.get(0)) {
                 e.preventDefault();
@@ -118,6 +122,11 @@ class LearnView {
         }
     }
     
+    onClickToggleFullscreen(e)
+    {
+        this.setFullscreen(!this.isFullscreen);
+    }
+    
     onClickToggleEdit(e) {
         e.stopPropagation();
         this.setMode(this.mode == "edit" ? "idle" : "edit");
@@ -161,6 +170,17 @@ class LearnView {
     {
         this.activeWordIndex = index;
         this.updateActiveWord();
+    }
+    
+    setFullscreen(flag)
+    {
+        this.isFullscreen = !!flag;
+        
+        if (this.isFullscreen) {
+            this.$app.addClass("fullscreen");
+        } else {
+            this.$app.removeClass("fullscreen");
+        }
     }
     
     saveTextToStorage(text) {
