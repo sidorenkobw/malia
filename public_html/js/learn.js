@@ -5,6 +5,8 @@ class LearnView {
         this.activeWordIndex = 0;
         this.$words = null;
         this.isFullscreen = false;
+        this.recordTimeout = 6000;
+        this.recordTimer = null;
         
         this.initEls();
         this.initButtons();
@@ -229,11 +231,17 @@ class LearnView {
     }
     
     startRecording() {
-        this.scrollToActiveWord();
         console.log("Start recording");
+        
+        this.scrollToActiveWord();
+        this.recordTimer = setTimeout((function () {
+            this.setMode("idle");
+            this.showNotification("Recording timeout");
+        }).bind(this), this.recordTimeout);
     }
     
     stopRecording() {
+        clearTimeout(this.recordTimer);
         console.log("Stop recording");
     }
     
@@ -293,6 +301,13 @@ class LearnView {
         if ((offsetTop > height - 30) || (offsetTop < 5)) {
             this.$textContainer.animate({scrollTop: scrollTop + offsetTop - 3}, 500);
         }
+    }
+    
+    showNotification(msg) {
+        $('.top-right').notify({
+            type: "danger",
+            message: { text: msg }
+        }).show();
     }
     
     showOverlay(msg) {

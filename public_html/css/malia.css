@@ -78,3 +78,7 @@ body {
 .controlsPanel button {
     width: 100%;
 }
+
+.notifications {
+    min-width: 300px;
+}
