@@ -48,7 +48,7 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
                 </button>
             </div>
             <div class="col-md-4 col-sm-4">
-                <button id="btnLearnNext" class="btn btn-success btn-lg pull-right" disabled="disabled" title="Save current word and record the next one. Keys: Space">
+                <button id="btnLearnNext" class="btn btn-success btn-lg pull-right" disabled="disabled" title="Save current word and record the next one. Keys: Space or Enter">
                     Next Word <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
                 </button>
             </div>
