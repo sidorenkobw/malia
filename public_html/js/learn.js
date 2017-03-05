@@ -209,6 +209,7 @@ class LearnView {
     }
     
     startRecording() {
+        this.scrollToActiveWord();
         console.log("Start recording");
     }
     
