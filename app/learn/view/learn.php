@@ -29,6 +29,11 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> <span class="caption">Edit Text</span>
                 </button>
             </div>
+            <div class="col-md-4" style="text-align: center">
+                <button id="btnSkipWord" class="btn btn-default btn-lg" disabled="disabled" title="Modify current text. Keys: Esc - to exit edit mode">
+                    <span class="caption">Skip Word</span> <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+                </button>
+            </div>
         </div>
         
         <div class="row">

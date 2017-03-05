@@ -38,6 +38,7 @@ class LearnView extends View {
             
             "word-next":   this.onWordNext,
             "word-retry":  this.onWordRetry,
+            "word-skip":   this.onWordSkip,
             "active-word": this.onActiveWord,
             
             "record-start":  this.onRecordStart,
@@ -57,6 +58,7 @@ class LearnView extends View {
         this.$btnRetry   = $("#btnLearnRetry");
         this.$btnToggleRecording = $("#btnLearnToggleRecording");
         this.$btnNext = $("#btnLearnNext");
+        this.$btnSkip = $("#btnSkipWord");
         this.$btnToggleEdit = $("#btnLearnToggleEdit");
         this.$btnToggleFullscreen = $("#btnFullScreen");
     }
@@ -89,6 +91,7 @@ class LearnView extends View {
         this.$btnToggleRecording.click(this.onClickToggleRecording.bind(this));
         this.$btnNext.click(this.onClickNext.bind(this));
         this.$btnRetry.click(this.onClickRetry.bind(this));
+        this.$btnSkip.click(this.onClickSkip.bind(this));
         this.$btnToggleFullscreen.click(this.onClickToggleFullscreen.bind(this));
         
         $(document).click((function(e) {
@@ -99,23 +102,35 @@ class LearnView extends View {
         }).bind(this));
     }
     
+    skipActiveWord() {
+        this.emit("word-skip");
+        
+        this.stopRecording();
+        this.deleteCurrentRecord();
+        
+        this.setActiveWord(this.activeWordIndex+1);
+    }
+    
     switchActiveWord(i) {
-        if (this.mode == "record") {
-            // TODO if recroded file exists:
-            this.stopRecording();
-            this.deleteCurrentRecord();
-        }
+        this.stopRecording();
+        this.deleteCurrentRecord();
         
         this.setActiveWord(i);
     }
     
-    setActiveWord(index) {
-        this.activeWordIndex = index;
-        this.emit("active-word");
-        
-        if (this.mode == "record") {
-            this.startRecording();
+    setActiveWord(i) {
+        if (this.$words.length == i) {
+            this.setMode("idle");
+            this.activeWordIndex = 0;
+            this.showNotification("success", "End of text.");
+        } else {
+            this.activeWordIndex = i;
+            if (this.mode == "record") {
+                this.startRecording();
+            }
         }
+        
+        this.emit("active-word");
     }
     
     onKeyPressed(e) {
@@ -180,6 +195,10 @@ class LearnView extends View {
         this.emit("word-retry");
     }
 
+    onClickSkip(e) {
+        this.skipActiveWord();
+    }
+
     setMode(mode) {
         var old = this.mode;
         this.mode = mode;
@@ -211,6 +230,7 @@ class LearnView extends View {
             
         this.$btnRetry.prop("disabled", false);
         this.$btnNext.prop("disabled", false);
+        this.$btnSkip.prop("disabled", false);
         
         this.$btnNext.focus();
         
@@ -229,6 +249,7 @@ class LearnView extends View {
 
         this.$btnRetry.prop("disabled", true);
         this.$btnNext.prop("disabled", true);
+        this.$btnSkip.prop("disabled", true);
         
         this.stopRecording();
         this.deleteCurrentRecord();
@@ -298,14 +319,7 @@ class LearnView extends View {
     onWordNext() {
         this.stopRecording();
         this.uploadActiveWord(this.getActiveWordEl().text());
-        
-        if (this.$words.length == this.activeWordIndex+1) {
-            this.setMode("idle");
-            this.setActiveWord(0);
-            this.showNotification("success", "End of text.");
-        } else {
-            this.setActiveWord(this.activeWordIndex+1);
-        }
+        this.setActiveWord(this.activeWordIndex+1);
     }
     
     onWordRetry() {
@@ -314,6 +328,10 @@ class LearnView extends View {
         this.stopRecording();
         this.deleteCurrentRecord();
         this.startRecording();
+    }
+    
+    onWordSkip() {
+        this.debug("Skip word");
     }
     
     onRecordStart() {
