@@ -34,7 +34,6 @@ class EventEmitter {
         if (event in this._eventCallbacks) {
             var callbacks = this._eventCallbacks[event] || [];
             for (var i in callbacks) {
-                console.log(callbacks[i])
                 callbacks[i](data, event);
             }
         }

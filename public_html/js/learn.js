@@ -11,12 +11,43 @@ class LearnView extends View {
         this.recordTimer = null;
         
         this.initEls();
+        this.initEvents();
         this.initButtons();
         this.initKeyboardEvents();
         this.initEditor();
         this.initTextContainer();
         
         this.render();
+    }
+    
+    initEvents() {
+        var events = {
+            "mode": this.onChangeMode,
+            
+            "mode-idle-on":  this.onModeIdleOn,
+            "mode-idle-off": this.onModeIdleOff,
+            
+            "mode-record-on":  this.onModeRecordOn,
+            "mode-record-off": this.onModeRecordOff,
+            
+            "mode-edit-on":  this.onModeEditOn,
+            "mode-edit-off": this.onModeEditOff,
+            
+            "fullscreen-on":  this.onFullscreenOn,
+            "fullscreen-off": this.onFullscreenOff,
+            
+            "word-next":   this.onWordNext,
+            "word-retry":  this.onWordRetry,
+            "active-word": this.onActiveWord,
+            
+            "record-start":  this.onRecordStart,
+            "record-stop":   this.onRecordStop,
+            "record-delete": this.onRecordDelete,
+        };
+        
+        for (var event in events) {
+            this.on(event, events[event].bind(this));
+        }
     }
     
     initEls() {
@@ -68,6 +99,21 @@ class LearnView extends View {
         }).bind(this));
     }
     
+    setActiveWord(index) {
+        if (this.mode == "record") {
+            // TODO if recroded file exists:
+            this.stopRecording();
+            this.deleteCurrentRecord();
+        }
+        
+        this.activeWordIndex = index;
+        this.emit("active-word");
+        
+        if (this.mode == "record") {
+            this.startRecording();
+        }
+    }
+    
     onKeyPressed(e) {
         var $target = $(e.target);
         
@@ -101,48 +147,10 @@ class LearnView extends View {
         }
     }
     
-    onChangeMode(old) {
-        if (old == "edit") {
-            this.showOverlay("Analyzing text...")
-            setTimeout((function () {
-                this.updateText();
-                this.saveTextToStorage(this.$textEditor.val());
-                this.hideOverlay();
-            }).bind(this), 10);
-        }
-        
-        if (old == "record") {
-            this.stopRecording();
-            this.deleteCurrentRecord();
-        }
-            
-        if (this.mode == "idle") {
-            this.$textContainer.show();
-            this.$textEditor.hide();
-        } else if (this.mode == "edit") {
-            this.$textContainer.hide();
-            this.$textEditor.show();
-            this.$textEditor.focus();
-        } else if (this.mode == "record") {
-            this.startRecording();
-        }
-        
-        this.updateButtons();
-    }
-    
     onClickTextContainer(e) {
         var $target = $(e.target);
         if ($target.is("span")) {
-            if (this.mode == "record") {
-                this.stopRecording();
-                this.deleteCurrentRecord();
-            }
-            
             this.setActiveWord(this.$words.index($target));
-            
-            if (this.mode == "record") {
-                this.startRecording();
-            }
         }
     }
     
@@ -161,6 +169,129 @@ class LearnView extends View {
     }
     
     onClickNext(e) {
+        this.emit("word-next");
+    }
+    
+    onClickRetry(e) {
+        this.emit("word-retry");
+    }
+
+    setMode(mode) {
+        var old = this.mode;
+        this.mode = mode;
+        this.emit("mode", old);
+    }
+    
+    onChangeMode(old) {
+        this.emit("mode-" + old + "-off");
+        this.emit("mode-" + this.mode + "-on");
+    }
+    
+    onModeIdleOn() {
+        this.debug("Mode idle on");
+    }
+    
+    onModeIdleOff() {
+        this.debug("Mode idle off");
+    }
+    
+    onModeRecordOn() {
+        this.debug("Mode record on");
+        
+        this.$btnToggleRecording
+            .removeClass("btn-primary")
+            .addClass("btn-danger")
+            .find(".caption")
+                .eq(0)
+                .text("Stop Recording");
+            
+        this.$btnNext.focus();
+        
+        this.$btnRetry.prop("disabled", false);
+        this.$btnNext.prop("disabled", false);
+        
+        this.startRecording();
+    }
+    
+    onModeRecordOff() {
+        this.debug("Mode record off");
+        
+        this.$btnToggleRecording
+            .addClass("btn-primary")
+            .removeClass("btn-danger")
+            .find(".caption")
+                .eq(0)
+                .text("Start Recording");
+
+        this.$btnRetry.prop("disabled", true);
+        this.$btnNext.prop("disabled", true);
+        
+        this.stopRecording();
+        this.deleteCurrentRecord();
+    }
+    
+    onModeEditOn() {
+        this.debug("Mode edit on");
+        
+        this.$textEditor.show();
+        this.$textContainer.hide();
+        
+        this.$btnToggleEdit
+            .toggleClass("btn-warning", true)
+            .find(".caption")
+                .eq(0)
+                .text("Finish Editing");
+    }
+    
+    onModeEditOff() {
+        this.debug("Mode edit off");
+        
+        this.$textEditor.hide();
+        this.$textContainer.show();
+        
+        this.$btnToggleEdit
+            .toggleClass("btn-warning", false)
+            .find(".caption")
+                .eq(0)
+                .text("Edit Text");
+        
+        this.showOverlay("Analyzing text...")
+        setTimeout((function () {
+            this.updateText();
+            this.saveTextToStorage(this.$textEditor.val());
+            this.hideOverlay();
+        }).bind(this), 10);
+    }
+
+    setFullscreen(flag) {
+        this.isFullscreen = !!flag;
+        this.emit("fullscreen-" + (this.isFullscreen ? "on" : "off"));
+    }
+    
+    onFullscreenOn() {
+        this.debug("Fullscreen on");
+        
+        this.$app.addClass("fullscreen");
+        this.$btnToggleFullscreen.addClass("btn-warning");
+        this.$btnToggleFullscreen.removeClass("btn-default");
+    }
+    
+    onFullscreenOff() {
+        this.debug("Fullscreen off");
+        
+        this.$app.removeClass("fullscreen");
+        this.$btnToggleFullscreen.removeClass("btn-warning");
+        this.$btnToggleFullscreen.addClass("btn-default");
+    }
+    
+    onActiveWord() {
+        this.debug("Active word changed");
+        this.$words.removeClass("active");
+        this.getActiveWordEl().addClass("active");
+        this.scrollToActiveWord();
+    }
+    
+    onWordNext() {
         this.stopRecording();
         this.uploadActiveWord(this.getActiveWordEl().text());
         
@@ -169,45 +300,39 @@ class LearnView extends View {
             this.setActiveWord(0);
             this.showNotification("success", "End of text.");
         } else {
-            this.setActiveWord(this.activeWordIndex+1)
-            this.startRecording();
+            this.setActiveWord(this.activeWordIndex+1);
         }
     }
     
-    onClickRetry(e) {
+    onWordRetry() {
+        this.debug("Retry word");
+        
         this.stopRecording();
         this.deleteCurrentRecord();
         this.startRecording();
     }
-
-    getActiveWordEl()
-    {
+    
+    onRecordStart() {
+        this.debug("Start recording");
+        
+        this.scrollToActiveWord();
+        this.recordTimer = setTimeout((function () {
+            this.setMode("idle");
+            this.showNotification("danger", "Recording timeout");
+        }).bind(this), this.recordTimeout);
+        
+    }
+    onRecordStop() {
+        this.debug("Stop recording");
+        clearTimeout(this.recordTimer);
+    }
+    
+    onRecordDelete() {
+        this.debug("Delete current record");
+    }
+    
+    getActiveWordEl() {
         return this.$words.eq(this.activeWordIndex);
-    }
-    
-    setMode(mode) {
-        var old = this.mode;
-        this.mode = mode;
-        this.onChangeMode(old);
-    }
-    
-    setActiveWord(index)
-    {
-        this.activeWordIndex = index;
-        this.updateActiveWord();
-    }
-    
-    setFullscreen(flag)
-    {
-        this.isFullscreen = !!flag;
-        
-        if (this.isFullscreen) {
-            this.$app.addClass("fullscreen");
-        } else {
-            this.$app.removeClass("fullscreen");
-        }
-        
-        this.updateButtons();
     }
     
     saveTextToStorage(text) {
@@ -223,64 +348,20 @@ class LearnView extends View {
         this.updateTextContainer(text);
     }
     
-    updateButtons()
-    {
-        if (this.mode == "edit") {
-            this.$btnToggleEdit.find(".caption").eq(0).text("Finish Editing");
-            this.$btnToggleRecording.prop("disabled", true);
-            this.$btnToggleEdit.toggleClass("btn-warning", true);
-        } else {
-            this.$btnToggleEdit.find(".caption").eq(0).text("Edit Text");
-            this.$btnToggleEdit.toggleClass("btn-warning", false);
-            this.$btnToggleRecording.prop("disabled", !this.$words.length);
-        }
-        
-        if (this.mode == "record") {
-            this.$btnToggleRecording.find(".caption").eq(0).text("Stop Recording");
-            this.$btnToggleRecording.removeClass("btn-primary");
-            this.$btnToggleRecording.addClass("btn-danger");
-            this.$btnRetry.prop("disabled", false);
-            this.$btnNext.prop("disabled", false);
-            this.$btnNext.focus();
-        } else {
-            this.$btnToggleRecording.find(".caption").eq(0).text("Start Recording");
-            this.$btnToggleRecording.addClass("btn-primary");
-            this.$btnToggleRecording.removeClass("btn-danger");
-            this.$btnRetry.prop("disabled", true);
-            this.$btnNext.prop("disabled", true);
-        }
-        
-        if (this.isFullscreen) {
-            this.$btnToggleFullscreen.addClass("btn-warning");
-            this.$btnToggleFullscreen.removeClass("btn-default");
-        } else {
-            this.$btnToggleFullscreen.removeClass("btn-warning");
-            this.$btnToggleFullscreen.addClass("btn-default");
-        }
-    }
-    
     uploadActiveWord(word) {
-        console.log("Upload word: " + word)
+        this.debug("Upload word: " + word)
     }
     
     startRecording() {
-        console.log("Start recording");
-        
-        this.scrollToActiveWord();
-        this.recordTimer = setTimeout((function () {
-            this.setMode("idle");
-            this.showNotification("danger", "Recording timeout");
-        }).bind(this), this.recordTimeout);
+        this.emit("record-start");
     }
     
     stopRecording() {
-        clearTimeout(this.recordTimer);
-        console.log("Stop recording");
+        this.emit("record-stop");
     }
     
-    deleteCurrentRecord()
-    {
-        console.log("Delete current record");
+    deleteCurrentRecord() {
+        this.emit("record-delete");
     }
     
     textToHtml(text) {
@@ -319,8 +400,7 @@ class LearnView extends View {
         this.setActiveWord(0);
     }
     
-    scrollToActiveWord()
-    {
+    scrollToActiveWord() {
         var $el = this.getActiveWordEl();
         
         if (!$el.length) {
@@ -337,12 +417,6 @@ class LearnView extends View {
         if ((offsetTop > height - 30) || (offsetTop < 5)) {
             this.$textContainer.animate({scrollTop: scrollTop + offsetTop - 3}, 500);
         }
-    }
-    
-    updateActiveWord() {
-        this.$words.removeClass("active");
-        this.getActiveWordEl().addClass("active");
-        this.scrollToActiveWord();
     }
     
     render() {

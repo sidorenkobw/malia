@@ -23,4 +23,8 @@ class View extends EventEmitter {
             this.$overlayContainer.hide();
         }).bind(this), 300);
     }
+    
+    debug(msg, level) {
+        console.log(msg)
+    }
 }

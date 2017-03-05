@@ -33,7 +33,7 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
         
         <div class="row">
             <div class="col-md-4 col-sm-4">
-                <button id="btnLearnRetry" class="btn-learn-retry btn btn-danger btn-lg" title="Cancel current word record and try again. Keys: Backspace">
+                <button id="btnLearnRetry" class="btn-learn-retry btn btn-danger btn-lg" disabled="disabled" title="Cancel current word record and try again. Keys: Backspace">
                     <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Retry Word
                 </button>
             </div>
@@ -43,7 +43,7 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
                 </button>
             </div>
             <div class="col-md-4 col-sm-4">
-                <button id="btnLearnNext" class="btn btn-success btn-lg pull-right" title="Save current word and record the next one. Keys: Space">
+                <button id="btnLearnNext" class="btn btn-success btn-lg pull-right" disabled="disabled" title="Save current word and record the next one. Keys: Space">
                     Next Word <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
                 </button>
             </div>
