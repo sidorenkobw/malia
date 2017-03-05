@@ -11,7 +11,7 @@
     
     <?php echo $this->head_after_meta ?>
     
-    <title><?php echo strlen($this->title) ? $this->title : 'Malia' ?></title>
+    <title><?php echo strlen($this->title) ? $this->title : 'Malia Speech' ?></title>
 
     <?php echo $this->head_before_css ?>
     
