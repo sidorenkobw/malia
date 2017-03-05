@@ -17,6 +17,34 @@
     width: 100%;
 }
 
+#learnApp {
+    position: relative;
+}
+
+.overlay, .overlayText {
+    position: absolute;
+    z-index: 9999;
+}
+
+.overlay {
+    background: white;
+    outline: 2px solid #efefef;
+    height: 100%;
+    left: 0;
+    top: 0;
+    width: 100%;
+}
+
+.overlayText {
+    background: white;
+    color: grey;
+    font-size: 30px;
+    left: 50%;
+    padding: 30px 50px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
 #learnTextContainer span {
     border: 1px solid #efefef;
     cursor: pointer;

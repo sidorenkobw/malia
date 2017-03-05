@@ -1,19 +1,23 @@
 class LearnView {
     constructor() {
-        this.initEls();
-        
         /* idle|record|edit */
         this.mode = "idle";
         this.activeWordIndex = 0;
         this.$words = null;
         
+        this.initEls();
         this.initButtons();
         this.initKeyboardEvents();
         this.initEditor();
         this.initTextContainer();
+        
+        this.render();
     }
     
     initEls() {
+        this.$app = $("#learnApp");
+        this.$overlayContainer = $(".overlayContainer");
+        this.$overlayText = $(".overlayText");
         this.$textContainer = $("#learnTextContainer");
         this.$textEditor = $("#learnTextEditor");
         this.$btnRetry   = $("#btnLearnRetry");
@@ -64,7 +68,11 @@ class LearnView {
     
     onChangeMode(old) {
         if (old == "edit") {
-            this.updateText();
+            this.showOverlay("Analyzing text...")
+            setTimeout((function () {
+                this.updateText();
+                this.hideOverlay();
+            }).bind(this), 10);
         }
         
         if (old == "record") {
@@ -257,15 +265,29 @@ class LearnView {
             height = this.$textContainer.height();
             
         if ((offsetTop > height - 5) || (offsetTop < 5)) {
-            console.log("scroll")
             this.$textContainer.animate({scrollTop: scrollTop + offsetTop - 3}, 500);
         }
+    }
+    
+    showOverlay(msg) {
+        this.$overlayText.text(msg);
+        this.$overlayContainer.show();
+    }
+    
+    hideOverlay() {
+        setTimeout((function () {
+            this.$overlayContainer.hide();
+        }).bind(this), 500);
     }
     
     updateActiveWord() {
         this.$words.removeClass("active");
         this.getActiveWordEl().addClass("active");
         this.scrollToActiveWord();
+    }
+    
+    render() {
+        this.hideOverlay();
     }
 }
 
