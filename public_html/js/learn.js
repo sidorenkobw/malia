@@ -200,23 +200,23 @@ class LearnView {
     updateButtons()
     {
         if (this.mode == "edit") {
-            this.$btnToggleEdit.find("span").eq(0).text("Finish Editing");
+            this.$btnToggleEdit.find(".caption").eq(0).text("Finish Editing");
             this.$btnToggleRecording.prop("disabled", true);
             this.$btnToggleEdit.toggleClass("btn-warning", true);
         } else {
-            this.$btnToggleEdit.find("span").eq(0).text("Edit Text");
+            this.$btnToggleEdit.find(".caption").eq(0).text("Edit Text");
             this.$btnToggleEdit.toggleClass("btn-warning", false);
             this.$btnToggleRecording.prop("disabled", !this.$words.length);
         }
         
         if (this.mode == "record") {
-            this.$btnToggleRecording.find("span").eq(0).text("Stop Recording");
+            this.$btnToggleRecording.find(".caption").eq(0).text("Stop Recording");
             this.$btnToggleRecording.removeClass("btn-primary");
             this.$btnToggleRecording.addClass("btn-danger");
             this.$btnRetry.prop("disabled", false);
             this.$btnNext.prop("disabled", false);
         } else {
-            this.$btnToggleRecording.find("span").eq(0).text("Start Recording");
+            this.$btnToggleRecording.find(".caption").eq(0).text("Start Recording");
             this.$btnToggleRecording.addClass("btn-primary");
             this.$btnToggleRecording.removeClass("btn-danger");
             this.$btnRetry.prop("disabled", true);
