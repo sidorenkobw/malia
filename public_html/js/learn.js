@@ -154,6 +154,7 @@ class LearnView {
         if (this.$words.length == this.activeWordIndex+1) {
             this.setMode("idle");
             this.setActiveWord(0);
+            this.showNotification("success", "End of text.");
         } else {
             this.setActiveWord(this.activeWordIndex+1)
             this.startRecording();
@@ -254,7 +255,7 @@ class LearnView {
         this.scrollToActiveWord();
         this.recordTimer = setTimeout((function () {
             this.setMode("idle");
-            this.showNotification("Recording timeout");
+            this.showNotification("danger", "Recording timeout");
         }).bind(this), this.recordTimeout);
     }
     
@@ -312,6 +313,9 @@ class LearnView {
             return;
         }
         
+        $el.clearQueue();
+        $el.stop();
+        
         var offsetTop = $el.offset().top - this.$textContainer.offset().top,
             scrollTop = this.$textContainer.scrollTop(),
             height = this.$textContainer.height();
@@ -321,9 +325,9 @@ class LearnView {
         }
     }
     
-    showNotification(msg) {
+    showNotification(type, msg) {
         $('.top-right').notify({
-            type: "danger",
+            type: type,
             message: { text: msg }
         }).show();
     }
