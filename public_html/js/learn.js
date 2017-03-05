@@ -69,13 +69,34 @@ class LearnView {
     }
     
     onKeyPressed(e) {
+        var $target = $(e.target);
+        
         if (e.which == 27) {
+            // esc
             if (this.mode != "idle") {
                 this.setMode("idle");
             }
-            
-            if (this.isFullscreen) {
-                this.setFullscreen(false);
+        } else if (e.which == 13 && e.ctrlKey) {
+            // ctrl + enter
+            if (this.mode != "record") {
+                e.preventDefault();
+                this.setMode("record");
+            }
+        } else if (e.which == 13 && e.altKey) {
+            // alt + enter
+            e.preventDefault();
+            this.setFullscreen(!this.isFullscreen);
+        } else if (e.which == 32 || e.which == 13) {
+            // space or enter
+            if (this.mode == "record") {
+                e.preventDefault();
+                this.$btnNext.click();
+            }
+        } else if (e.which == 8) {
+            // backspace
+            if (this.mode == "record") {
+                e.preventDefault();
+                this.$btnRetry.click();
             }
         }
     }
@@ -98,19 +119,11 @@ class LearnView {
         if (this.mode == "idle") {
             this.$textContainer.show();
             this.$textEditor.hide();
-            
-            this.$btnToggleRecording.prop("disabled", false);
-            this.$btnRetry.prop("disabled", true);
-            this.$btnNext.prop("disabled", true);
-        } if (this.mode == "edit") {
+        } else if (this.mode == "edit") {
             this.$textContainer.hide();
             this.$textEditor.show();
-            
-            this.$btnToggleRecording.prop("disabled", true);
-            this.$btnRetry.prop("disabled", true);
-            this.$btnNext.prop("disabled", true);
             this.$textEditor.focus();
-        } else if (this.mode == "record"){
+        } else if (this.mode == "record") {
             this.startRecording();
         }
         
@@ -228,6 +241,7 @@ class LearnView {
             this.$btnToggleRecording.addClass("btn-danger");
             this.$btnRetry.prop("disabled", false);
             this.$btnNext.prop("disabled", false);
+            this.$btnNext.focus();
         } else {
             this.$btnToggleRecording.find(".caption").eq(0).text("Start Recording");
             this.$btnToggleRecording.addClass("btn-primary");
