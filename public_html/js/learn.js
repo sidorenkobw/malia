@@ -182,10 +182,10 @@ class LearnView {
         if (this.mode == "edit") {
             this.$btnToggleEdit.find("span").eq(0).text("Finish Editing");
             this.$btnToggleRecording.prop("disabled", true);
-            this.$btnToggleEdit.toggleClass("btn-primary", true);
+            this.$btnToggleEdit.toggleClass("btn-warning", true);
         } else {
             this.$btnToggleEdit.find("span").eq(0).text("Edit Text");
-            this.$btnToggleEdit.toggleClass("btn-primary", false);
+            this.$btnToggleEdit.toggleClass("btn-warning", false);
             this.$btnToggleRecording.prop("disabled", !this.$words.length);
         }
         
