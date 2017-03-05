@@ -61,7 +61,7 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.fullscreen #learnTextContainer {
+.fullscreen #learnTextContainer, .fullscreen #learnTextEditor {
     height: calc(100vh - 160px);
     min-height: 200px;
 }
