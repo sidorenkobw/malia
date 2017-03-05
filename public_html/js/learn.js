@@ -264,7 +264,7 @@ class LearnView {
             scrollTop = this.$textContainer.scrollTop(),
             height = this.$textContainer.height();
             
-        if ((offsetTop > height - 5) || (offsetTop < 5)) {
+        if ((offsetTop > height - 30) || (offsetTop < 5)) {
             this.$textContainer.animate({scrollTop: scrollTop + offsetTop - 3}, 500);
         }
     }
