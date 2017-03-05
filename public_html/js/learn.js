@@ -186,6 +186,8 @@ class LearnView {
         } else {
             this.$app.removeClass("fullscreen");
         }
+        
+        this.updateButtons();
     }
     
     saveTextToStorage(text) {
@@ -226,6 +228,14 @@ class LearnView {
             this.$btnToggleRecording.removeClass("btn-danger");
             this.$btnRetry.prop("disabled", true);
             this.$btnNext.prop("disabled", true);
+        }
+        
+        if (this.isFullscreen) {
+            this.$btnToggleFullscreen.addClass("btn-warning");
+            this.$btnToggleFullscreen.removeClass("btn-default");
+        } else {
+            this.$btnToggleFullscreen.removeClass("btn-warning");
+            this.$btnToggleFullscreen.addClass("btn-default");
         }
     }
     
