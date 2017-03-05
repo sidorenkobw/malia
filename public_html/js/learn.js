@@ -35,9 +35,14 @@ class LearnView {
     }
     
     initEditor() {
+        var text = this.loadTextFromStorage();
+        
+        if (null !== text && typeof text != "undefined") {
+            this.$textEditor.val(text);
+        }
+        
         this.$textEditor
             .removeClass("hidden")
-            .val(this.loadTextFromStorage())
             .hide();
             
         this.updateText();
@@ -80,6 +85,7 @@ class LearnView {
             this.showOverlay("Analyzing text...")
             setTimeout((function () {
                 this.updateText();
+                this.saveTextToStorage(this.$textEditor.val());
                 this.hideOverlay();
             }).bind(this), 10);
         }
@@ -200,7 +206,6 @@ class LearnView {
     
     updateText() {
         var text = this.$textEditor.val();
-        this.saveTextToStorage(text);
         this.updateTextContainer(text);
     }
     

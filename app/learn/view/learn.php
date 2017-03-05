@@ -11,7 +11,7 @@ $this->getLayout()->head_css .= '<link href="/lib/bootstrap-notify/css/bootstrap
 <div id="learnApp">
     <div class="learnTextPanel">
         <div id="learnTextContainer" class="textPanel"></div>
-        <textarea id="learnTextEditor" class="textPanel hidden"></textarea>
+        <textarea id="learnTextEditor" class="textPanel hidden">Click &quot;Edit Text&quot; to add your text.</textarea>
     </div>
 
     <div class="controlsPanel">
