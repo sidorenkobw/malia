@@ -1,5 +1,7 @@
-class LearnView {
+class LearnView extends View {
     constructor() {
+        super();
+        
         /* idle|record|edit */
         this.mode = "idle";
         this.activeWordIndex = 0;
@@ -19,8 +21,6 @@ class LearnView {
     
     initEls() {
         this.$app = $("#learnApp");
-        this.$overlayContainer = $(".overlayContainer");
-        this.$overlayText = $(".overlayText");
         this.$textContainer = $("#learnTextContainer");
         this.$textEditor = $("#learnTextEditor");
         this.$btnRetry   = $("#btnLearnRetry");
@@ -337,24 +337,6 @@ class LearnView {
         if ((offsetTop > height - 30) || (offsetTop < 5)) {
             this.$textContainer.animate({scrollTop: scrollTop + offsetTop - 3}, 500);
         }
-    }
-    
-    showNotification(type, msg) {
-        $('.top-right').notify({
-            type: type,
-            message: { text: msg }
-        }).show();
-    }
-    
-    showOverlay(msg) {
-        this.$overlayText.text(msg);
-        this.$overlayContainer.show();
-    }
-    
-    hideOverlay() {
-        setTimeout((function () {
-            this.$overlayContainer.hide();
-        }).bind(this), 300);
     }
     
     updateActiveWord() {
