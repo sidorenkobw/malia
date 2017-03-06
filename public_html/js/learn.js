@@ -253,6 +253,7 @@ class LearnView extends View {
         
         this.$textEditor.show();
         this.$textContainer.hide();
+        this.$textEditor.focus();
         
         this.$btnToggleEdit
             .toggleClass("btn-warning", true)
