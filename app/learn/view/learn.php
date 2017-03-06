@@ -54,9 +54,9 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
             </div>
         </div>
     </div>
-    
-    <div class="overlayContainer">
-        <div class="overlay"></div>
-        <div class="overlayText">Loading...</div>
-    </div>
+</div>
+
+<div class="overlayContainer">
+    <div class="overlay"></div>
+    <div class="overlayText">Loading...</div>
 </div>

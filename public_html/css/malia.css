@@ -12,9 +12,9 @@ body {
 }
 
 .overlay {
+    position: absolute;
     background: white;
     outline: 2px solid white;
-    border: 2px solid #efefef;
     height: 100%;
     left: 0;
     top: 0;
@@ -47,10 +47,6 @@ body {
     overflow-y: scroll;
     padding: 2px;
     width: 100%;
-}
-
-#learnApp {
-    position: relative;
 }
 
 #learnApp.fullscreen {
