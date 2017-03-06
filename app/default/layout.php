@@ -15,9 +15,7 @@
 
     <?php echo $this->head_before_css ?>
     
-    <!-- Bootstrap -->
     <link href="<?php echo $this->cfg['libs']['bootsrap_css'] ?>" rel="stylesheet">
-    <link href="/css/jumbotron-narrow.css" rel="stylesheet">
     <link href="/css/malia.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
     
     <?php echo $this->head_css ?>
@@ -50,17 +48,32 @@ $menu = array(
 
 <div class="container">
     <div class="header clearfix">
-        <nav>
-            <ul class="nav nav-pills pull-right">
-                <?php foreach ($menu as $module => $item): ?>
-                    <li role="presentation"<?php echo ($module == $this->currentModule ? ' class="active"' : '') ?>>
-                        <a href="<?php echo $this->escape($item['url']) ?>"><?php echo $this->escape($item['title']) ?></a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    
+                    <a class="navbar-brand" href="/">
+                        <span class="caption">Malia Speech</span>
+                        <span class="icon glyphicon glyphicon-volume-up"></span>
+                    </a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse pull-right">
+                    <ul class="nav navbar-nav nav-pills">
+                        <?php foreach ($menu as $module => $item): ?>
+                            <li role="presentation"<?php echo ($module == $this->currentModule ? ' class="active"' : '') ?>>
+                                <a href="<?php echo $this->escape($item['url']) ?>"><?php echo $this->escape($item['title']) ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
         </nav>
-        
-        <h3 class="text-muted">Malia Speech</h3>
     </div>
 
     <?php echo $this->contents ?>

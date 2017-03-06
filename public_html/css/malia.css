@@ -2,6 +2,34 @@ body {
     padding: 20px;
 }
 
+.marketing,
+.footer {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.marketing {
+    margin: 40px 0;
+}
+
+.marketing p + h4 {
+    margin-top: 28px;
+}
+
+@media screen and (min-width: 768px) {
+    .marketing,
+    .footer {
+        padding-right: 0;
+        padding-left: 0;
+    }
+}
+
+.footer {
+    padding-top: 19px;
+    color: #777;
+    border-top: 1px solid #e5e5e5;
+}
+
 .overlay, .overlayText {
     position: absolute;
     z-index: 9999;
@@ -60,7 +88,8 @@ body {
     max-height: calc(100vh - 40px);
 }
 
-.fullscreen #learnTextContainer, .fullscreen #learnTextEditor {
+.fullscreen #learnTextContainer,
+.fullscreen #learnTextEditor {
     height: calc(100vh - 160px);
     min-height: 200px;
 }
