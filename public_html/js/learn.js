@@ -98,15 +98,19 @@ class LearnView extends View {
     skipActiveWord() {
         this.emit("word-skip");
         
-        this.stopRecording();
-        this.deleteCurrentRecord();
+        if (this.mode == "record") {
+            this.stopRecording();
+            this.deleteCurrentRecord();
+        }
         
         this.setActiveWord(this.activeWordIndex+1);
     }
     
     switchActiveWord(i) {
-        this.stopRecording();
-        this.deleteCurrentRecord();
+        if (this.mode == "record") {
+            this.stopRecording();
+            this.deleteCurrentRecord();
+        }
         
         this.setActiveWord(i);
     }
