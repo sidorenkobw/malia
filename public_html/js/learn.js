@@ -7,7 +7,7 @@ class LearnView extends View {
         this.activeWordIndex = 0;
         this.$words = null;
         this.isFullscreen = false;
-        this.recordTimeout = 6000;
+        this.recordTimeout = 10000;
         this.recordTimer = null;
         
         this.initEls();
