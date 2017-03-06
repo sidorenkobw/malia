@@ -1,3 +1,89 @@
+class Recorder {
+    constructor() {
+        this.mimeType = 'audio/webm;codecs=opus';
+        this.chunks = [];
+        this.mediaRecorder = null;
+
+        // This makes the 'allow page to record?' permission appear.
+        navigator.mediaDevices.getUserMedia({"audio": true, "video": false })
+            .then((stream) => {
+                this.mediaRecorder = new MediaRecorder(stream, {mimeType: this.mimeType});
+
+                this.mediaRecorder.ondataavailable = this._onData.bind(this);
+                this.mediaRecorder.onstop = this._onStop.bind(this);
+
+                this.mediaRecorder.onerror = (e) => {
+                    console.log('Error: ', e);
+                };
+
+                this.mediaRecorder.onstart = () => {
+                    console.log('Started, state = ' + this.mediaRecorder.state);
+                };
+
+                this.mediaRecorder.onwarning = (e) => {
+                    console.log('Warning: ' + e);
+                };
+            }).catch((err) => {
+                console.log('getUserMedia err', err);
+            });
+    }
+
+    startRecording() {
+        if (!this.mediaRecorder) {
+            return;
+        }
+        this.chunks = [];
+        this.mediaRecorder.start(/*timeslice*/ 1000);
+    }
+
+    stopRecording() {
+        if (!this.mediaRecorder) {
+            return;
+        }
+        this.mediaRecorder.stop();
+    }
+
+    _onStop() {
+        var blob = new Blob(this.chunks, {type: this.mimeType});
+        this._uploadFirebase(blob);
+        this.chunks = [];
+    }
+
+    _uploadFirebase(blob) {
+        var config = {
+            apiKey: "AIzaSyAmTywORdeldcyolqVUnj_gUEyzBlwRP3U",
+            authDomain: "malia-speech.firebaseapp.com",
+            databaseURL: "https://malia-speech.firebaseio.com",
+            storageBucket: "malia-speech.appspot.com",
+            messagingSenderId: "808979079469"
+        };
+        firebase.initializeApp(config);
+
+        var storage = firebase.storage();
+        var storageRef = storage.ref();
+        var ref = storageRef.child('incoming/sound1.webm');
+        ref.put(blob).then(function(snapshot) {
+            console.log('Uploaded a blob or file!');
+        });
+    }
+
+    _uploadPost(blob) {
+        $.ajax({
+            type: "POST",
+            url: "audioRecordings",
+            contentType: this.mimeType,
+            processData: false,
+            data: blob,
+            success: () => {}
+        });
+    }
+
+    _onData(ev) {
+        this.chunks.push(ev.data);
+        console.log(`audio recording has ${this.chunks.length} chunks`);
+    }
+}
+
 class LearnView extends View {
     constructor() {
         super();
@@ -10,6 +96,7 @@ class LearnView extends View {
         this.isFullscreenAuto = false;
         this.recordTimeout = 10000;
         this.recordTimer = null;
+        this.recorder = new Recorder();
         
         this.initEls();
         this.initEvents();
@@ -408,10 +495,12 @@ class LearnView extends View {
     }
     
     startRecording() {
+        this.recorder.startRecording();
         this.emit("record-start");
     }
     
     stopRecording() {
+        this.recorder.stopRecording();
         this.emit("record-stop");
     }
     
