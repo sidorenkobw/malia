@@ -68,18 +68,12 @@ class LearnView extends View {
     }
     
     initEditor() {
-        var text = this.loadTextFromStorage();
-        
-        if (null !== text && typeof text != "undefined") {
-            this.$textEditor.val(text);
-        }
-        
         this.$textEditor
             .removeClass("hidden")
             .hide();
             
-        this.updateText();
-        this.onChangeMode();
+        this.updateText(this.loadTextFromStorage());
+        this.emit("mode");
     }
     
     initKeyboardEvents() {
@@ -278,10 +272,10 @@ class LearnView extends View {
                 .eq(0)
                 .text("Edit Text");
         
-        this.showOverlay("Analyzing text...")
+        this.showOverlay("Analyzing text...");
+        
         setTimeout((function () {
             this.updateText();
-            this.saveTextToStorage(this.$textEditor.val());
             this.hideOverlay();
         }).bind(this), 10);
     }
@@ -358,12 +352,40 @@ class LearnView extends View {
     }
     
     loadTextFromStorage() {
-        return localStorage.getItem("text");
+        return localStorage.getItem("text") || "";
     }
     
-    updateText() {
-        var text = this.$textEditor.val();
-        this.updateTextContainer(text);
+    deleteTextFromStorage() {
+        localStorage.removeItem("text");
+    }
+    
+    updateText(text) {
+        var text = arguments.length ? text : this.$textEditor.val(),
+            saveText = !arguments.length;
+        
+        if (text.trim() == "") {
+            text = "Click \"Edit Text\" to add your text.";
+            saveText = false;
+            this.$textEditor.val(text);
+        }
+
+        if (arguments.length) {
+            this.$textEditor.val(text);
+        }
+        
+        if (saveText) {
+            this.saveTextToStorage(text);
+        }
+        
+        var textHtml = this.textToHtml(text);
+        this.$textContainer.html(textHtml);
+        
+        this.$textContainer
+            .empty()
+            .html(textHtml);
+            
+        this.$words = this.$textContainer.find("span");
+        this.setActiveWord(0);
     }
     
     uploadActiveWord(word) {
@@ -405,17 +427,6 @@ class LearnView extends View {
             .join("<br>");
 
         return text;
-    }
-    
-    updateTextContainer(text) {
-        text = this.textToHtml(text);
-        
-        this.$textContainer
-            .empty()
-            .html(text);
-            
-        this.$words = this.$textContainer.find("span");
-        this.setActiveWord(0);
     }
     
     scrollToActiveWord() {
