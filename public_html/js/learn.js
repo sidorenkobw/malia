@@ -7,6 +7,7 @@ class LearnView extends View {
         this.activeWordIndex = 0;
         this.$words = null;
         this.isFullscreen = false;
+        this.isFullscreenAuto = false;
         this.recordTimeout = 10000;
         this.recordTimer = null;
         
@@ -141,7 +142,7 @@ class LearnView extends View {
         } else if (e.which == 13 && e.altKey) {
             // alt + enter
             e.preventDefault();
-            this.setFullscreen(!this.isFullscreen);
+            this.setFullScreenbyUser(!this.isFullscreen);
         } else if (e.which == 32 || e.which == 13) {
             // space or enter
             if (this.mode == "record") {
@@ -166,7 +167,7 @@ class LearnView extends View {
     
     onClickToggleFullscreen(e)
     {
-        this.setFullscreen(!this.isFullscreen);
+        this.setFullScreenbyUser(!this.isFullscreen);
     }
     
     onClickToggleEdit(e) {
@@ -225,6 +226,11 @@ class LearnView extends View {
         
         this.$btnNext.focus();
         
+        if (!this.isFullscreen) {
+            this.isFullscreenAuto = true;
+        }
+        this.setFullscreen(true);
+        
         this.startRecording();
     }
     
@@ -241,6 +247,10 @@ class LearnView extends View {
         this.$btnRetry.prop("disabled", true);
         this.$btnNext.prop("disabled", true);
         this.$btnSkip.prop("disabled", true);
+        
+        if (this.isFullscreenAuto) {
+            this.setFullscreen(false);
+        }
         
         this.stopRecording();
         this.deleteCurrentRecord();
@@ -283,6 +293,11 @@ class LearnView extends View {
     setFullscreen(flag) {
         this.isFullscreen = !!flag;
         this.emit("fullscreen-" + (this.isFullscreen ? "on" : "off"));
+    }
+    
+    setFullScreenbyUser(flag) {
+        this.isFullscreenAuto = false;
+        this.setFullscreen(flag);
     }
     
     onFullscreenOn() {
