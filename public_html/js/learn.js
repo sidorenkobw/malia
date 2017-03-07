@@ -146,13 +146,13 @@ class LearnView extends View {
             // space or enter
             if (this.mode == "record") {
                 e.preventDefault();
-                this.$btnNext.click();
+                this.emit("word-next");
             }
         } else if (e.which == 8) {
             // backspace
             if (this.mode == "record") {
                 e.preventDefault();
-                this.$btnRetry.click();
+                this.emit("word-retry");
             }
         }
     }
