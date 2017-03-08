@@ -2,7 +2,7 @@
 
 defined('ROOT_DIR') || define('ROOT_DIR', realpath(dirname($_SERVER['DOCUMENT_ROOT'])));
 defined('PUBLIC_DIR') || define('PUBLIC_DIR', ROOT_DIR . '/public_html');
-defined('APP_DIR') || define('APP_DIR', ROOT_DIR . '/app');
+defined('APP_DIR') || define('APP_DIR', ROOT_DIR . '/webui');
 defined('LIB_DIR') || define('LIB_DIR', ROOT_DIR . '/lib');
 defined('CFG_DIR') || define('CFG_DIR', APP_DIR . '/config');
 
