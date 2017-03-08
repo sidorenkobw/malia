@@ -2,6 +2,10 @@ body {
     padding: 20px;
 }
 
+.auth.alert .btnAuth {
+    margin-left: 10px;
+}
+
 .marketing,
 .footer {
     padding-right: 15px;

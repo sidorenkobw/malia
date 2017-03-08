@@ -20,6 +20,9 @@ class Malia_Controller
     {
         $this->initView();
         $this->init();
+        
+        $this->view->cfg = $this->cfg;
+        $this->view->getLayout()->cfg = $this->cfg;
     }
     
     public function init()

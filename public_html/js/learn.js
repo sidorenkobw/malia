@@ -75,19 +75,12 @@ class Recorder {
 }
 
 class FirebaseProxy {
-    constructor() {
+    constructor(cfg) {
         if (!firebase) {
             throw new Error("missing firebase.js");
         }
 
-        var config = {
-            apiKey: "AIzaSyAmTywORdeldcyolqVUnj_gUEyzBlwRP3U",
-            authDomain: "malia-speech.firebaseapp.com",
-            databaseURL: "https://malia-speech.firebaseio.com",
-            storageBucket: "malia-speech.appspot.com",
-            messagingSenderId: "808979079469"
-        };
-        firebase.initializeApp(config);
+        firebase.initializeApp(cfg);
 
         var uiConfig = {
             signInSuccessUrl: 'learn.php',
@@ -139,8 +132,10 @@ class FirebaseProxy {
 }
 
 class LearnView extends View {
-    constructor() {
+    constructor(cfg) {
         super();
+        
+        this.cfg = cfg;
         
         /* idle|record|edit */
         this.mode = "idle";
@@ -150,7 +145,7 @@ class LearnView extends View {
         this.isFullscreenAuto = false;
         this.recordTimeout = 10000;
         this.recordTimer = null;
-        this.firebaseProxy = new FirebaseProxy();
+        this.firebaseProxy = new FirebaseProxy(cfg.auth.firebase);
         this.recorder = new Recorder(this.firebaseProxy);
         
         this.initEls();
@@ -611,7 +606,3 @@ class LearnView extends View {
         this.hideOverlay();
     }
 }
-
-$(function () {
-    var view = new LearnView();
-});

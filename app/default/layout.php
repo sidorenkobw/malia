@@ -37,8 +37,6 @@
 <?php
 $menu = array(
     'home' => array('title' => 'Home', 'url' => '/'),
-    'login' => array('title' => 'Login', 'url' => '#login'),
-    'signup' => array('title' => 'Sign Up', 'url' => '#signup'),
     'learn' => array('title' => 'Learn', 'url' => '/learn.php'),
     'speak' => array('title' => 'Speak', 'url' => '#speak'),
     'about' => array('title' => 'About', 'url' => '#about'),
@@ -70,6 +68,7 @@ $menu = array(
                                 <a href="<?php echo $this->escape($item['url']) ?>"><?php echo $this->escape($item['title']) ?></a>
                             </li>
                         <?php endforeach; ?>
+                        <li><a href="#">Sign out</a></li>
                     </ul>
                 </div>
             </div>
@@ -87,11 +86,21 @@ $menu = array(
 
 <?php echo $this->body_before_scripts ?>
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="<?php echo $this->cfg['libs']['jquery'] ?>"></script>
 
-<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/js/event-emitter.js?build=<?php echo $this->cfg['build'] ?>"></script>
+
 <script src="<?php echo $this->cfg['libs']['bootstrap_js'] ?>"></script>
+<script>
+    $(function () {
+        var malia = {};
+        malia.cfg = {
+            'auth': <?php echo json_encode($this->cfg['auth']['federated']); ?>
+        };
+        
+        <?php echo $this->js_init ?>
+    });
+</script>
 
 <script src="https://www.gstatic.com/firebasejs/3.6.10/firebase.js"></script>
 <script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
