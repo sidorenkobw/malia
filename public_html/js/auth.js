@@ -43,7 +43,7 @@ class FirebaseProxy extends EventEmitter {
                 self.emit("sign-out", user);
             }
         }, function(error) {
-            console.log(error);
+            self.emit("error", error);
         });
     }
     
@@ -108,7 +108,8 @@ class AuthView extends View {
     
     onError(e) {
         this.emit("error", e);
-        console.log(e);
+        this.debug(e);
+        this.showNotification("danger", "Authentication error");
     }
     
     getProxy() {
