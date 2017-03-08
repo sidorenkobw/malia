@@ -25,6 +25,8 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
         </td> </tr>
     </table>
 
+    <div>Incoming sound meter: <span id="meter"></span></div>
+
     <div class="learnTextPanel">
         <div id="learnTextContainer" class="textPanel"></div>
         <textarea id="learnTextEditor" class="textPanel hidden"></textarea>
