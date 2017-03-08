@@ -93,6 +93,10 @@ $menu = array(
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="<?php echo $this->cfg['libs']['bootsrap_js'] ?>"></script>
 
+<script src="https://www.gstatic.com/firebasejs/3.6.10/firebase.js"></script>
+<script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
+<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css">
+
 <?php echo $this->body_scripts ?>
 
 <?php echo $this->body_after_scripts ?>

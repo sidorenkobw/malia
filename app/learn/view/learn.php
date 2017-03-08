@@ -12,6 +12,19 @@ $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->
 <div class="notifications top-right"></div>
 
 <div id="learnApp">
+
+    <table border="8">
+        <tr><th>move me</th></tr>
+        <tr> <td>
+            <div id="firebaseui-auth-container"></div>
+        </td> </tr>
+        <tr> <td>
+            <div id="sign-in-status"></div>
+            <div id="sign-in"></div>
+            <div id="account-details"></div>
+        </td> </tr>
+    </table>
+
     <div class="learnTextPanel">
         <div id="learnTextContainer" class="textPanel"></div>
         <textarea id="learnTextEditor" class="textPanel hidden"></textarea>

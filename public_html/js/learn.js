@@ -1,8 +1,9 @@
 class Recorder {
-    constructor() {
+    constructor(firebaseProxy) {
         this.mimeType = 'audio/webm;codecs=opus';
         this.chunks = [];
         this.mediaRecorder = null;
+        this.firebaseProxy = firebaseProxy;
 
         // This makes the 'allow page to record?' permission appear.
         navigator.mediaDevices.getUserMedia({"audio": true, "video": false })
@@ -50,21 +51,11 @@ class Recorder {
     }
 
     _uploadFirebase(blob) {
-        var config = {
-            apiKey: "AIzaSyAmTywORdeldcyolqVUnj_gUEyzBlwRP3U",
-            authDomain: "malia-speech.firebaseapp.com",
-            databaseURL: "https://malia-speech.firebaseio.com",
-            storageBucket: "malia-speech.appspot.com",
-            messagingSenderId: "808979079469"
-        };
-        firebase.initializeApp(config);
 
-        var storage = firebase.storage();
-        var storageRef = storage.ref();
-        var ref = storageRef.child('incoming/sound1.webm');
-        ref.put(blob).then(function(snapshot) {
+        this.firebaseProxy.upload(blob, 'incoming/sound1.webm').then(function(snapshot) {
             console.log('Uploaded a blob or file!');
         });
+
     }
 
     _uploadPost(blob) {
@@ -84,6 +75,70 @@ class Recorder {
     }
 }
 
+class FirebaseProxy {
+    constructor() {
+        if (!firebase) {
+            throw new Error("missing firebase.js");
+        }
+
+        var config = {
+            apiKey: "AIzaSyAmTywORdeldcyolqVUnj_gUEyzBlwRP3U",
+            authDomain: "malia-speech.firebaseapp.com",
+            databaseURL: "https://malia-speech.firebaseio.com",
+            storageBucket: "malia-speech.appspot.com",
+            messagingSenderId: "808979079469"
+        };
+        firebase.initializeApp(config);
+
+        var uiConfig = {
+            signInSuccessUrl: 'learn.php',
+            signInOptions: [
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            ],
+            tosUrl: '<your-tos-url>'
+        };
+
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+        ui.start('#firebaseui-auth-container', uiConfig);
+
+        var initApp = function() {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    // User is signed in.
+                    user.getToken().then(function(accessToken) {
+                        document.getElementById('sign-in-status').textContent = 'Signed in';
+                        document.getElementById('sign-in').textContent = 'Sign out';
+                        console.log('firebase: signed in: ', {
+                            displayName: user.displayName,
+                            email: user.email,
+                            emailVerified: user.emailVerified,
+                            photoURL: user.photoURL,
+                            uid: user.uid,
+                            accessToken: accessToken,
+                            providerData: user.providerData
+                        });
+                    });
+                } else {
+                    // User is signed out.
+                    document.getElementById('sign-in-status').textContent = 'Signed out';
+                    document.getElementById('sign-in').textContent = 'Sign in';
+                    console.log('firebase: signed out');
+                }
+            }, function(error) {
+                console.log(error);
+            });
+        };
+        initApp();
+    }
+    upload(blob, path) {
+        var storage = firebase.storage();
+        var storageRef = storage.ref();
+        var ref = storageRef.child(path);
+        return ref.put(blob);
+    }
+}
+
 class LearnView extends View {
     constructor() {
         super();
@@ -96,7 +151,8 @@ class LearnView extends View {
         this.isFullscreenAuto = false;
         this.recordTimeout = 10000;
         this.recordTimer = null;
-        this.recorder = new Recorder();
+        this.firebaseProxy = new FirebaseProxy();
+        this.recorder = new Recorder(this.firebaseProxy);
         
         this.initEls();
         this.initEvents();
