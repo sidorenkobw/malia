@@ -15,7 +15,7 @@
 
     <?php echo $this->head_before_css ?>
     
-    <link href="<?php echo $this->cfg['libs']['bootsrap_css'] ?>" rel="stylesheet">
+    <link href="<?php echo $this->cfg['libs']['bootstrap_css'] ?>" rel="stylesheet">
     <link href="/css/malia.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
     
     <?php echo $this->head_css ?>
@@ -91,7 +91,7 @@ $menu = array(
 <script src="<?php echo $this->cfg['libs']['jquery'] ?>"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="<?php echo $this->cfg['libs']['bootsrap_js'] ?>"></script>
+<script src="<?php echo $this->cfg['libs']['bootstrap_js'] ?>"></script>
 
 <script src="https://www.gstatic.com/firebasejs/3.6.10/firebase.js"></script>
 <script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
