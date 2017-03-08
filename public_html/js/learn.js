@@ -51,11 +51,10 @@ class Recorder {
     }
 
     _uploadFirebase(blob) {
-
-        this.firebaseProxy.upload(blob, 'incoming/sound1.webm').then(function(snapshot) {
+        var path = 'incoming/sound-'+Date.now()+'.webm';
+        this.firebaseProxy.upload(blob, path).then(function(snapshot) {
             console.log('Uploaded a blob or file!');
         });
-
     }
 
     _uploadPost(blob) {
