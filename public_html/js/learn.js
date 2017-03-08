@@ -1,5 +1,36 @@
+class Meter {
+    constructor(elem, stream) {
+        this.elem = elem;
+        let ctx = new AudioContext();
+        this.analyser = ctx.createAnalyser();
+        let microphone = ctx.createMediaStreamSource(stream);
+        microphone.connect(this.analyser);
+
+        this.analyser.fftSize = 128;
+        this.dataArray = new Uint8Array(this.analyser.fftSize);
+
+        this.update();
+    }
+
+    update() {
+        this.analyser.getByteTimeDomainData(this.dataArray);
+        let maxLevel = 0;
+        this.dataArray.forEach((e) => {
+            let mag = Math.abs(e - 128);
+            if (mag > maxLevel) {
+                maxLevel = mag;
+            }
+        });
+        let bars = Math.max(0, Math.round(Math.log(maxLevel)));
+        this.elem.innerHTML = "&#x1f431;".repeat(bars);
+        requestAnimationFrame(function() {
+            setTimeout(this.update.bind(this), 100);
+        }.bind(this));
+    }
+}
+
 class Recorder {
-    constructor(firebaseProxy) {
+    constructor(firebaseProxy, meterElem) {
         this.mimeType = 'audio/webm;codecs=opus';
         this.chunks = [];
         this.mediaRecorder = null;
@@ -8,6 +39,7 @@ class Recorder {
         // This makes the 'allow page to record?' permission appear.
         navigator.mediaDevices.getUserMedia({"audio": true, "video": false })
             .then((stream) => {
+                new Meter(meterElem, stream)
                 this.mediaRecorder = new MediaRecorder(stream, {mimeType: this.mimeType});
 
                 this.mediaRecorder.ondataavailable = this._onData.bind(this);
@@ -146,8 +178,8 @@ class LearnView extends View {
         this.recordTimeout = 10000;
         this.recordTimer = null;
         this.firebaseProxy = new FirebaseProxy(cfg.auth.firebase);
-        this.recorder = new Recorder(this.firebaseProxy);
-        
+        this.recorder = new Recorder(this.firebaseProxy, document.querySelector("#meter"));
+
         this.initEls();
         this.initEvents();
         this.initButtons();

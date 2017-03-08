@@ -26,6 +26,8 @@ $this->getLayout()->js_init .= 'var app = new LearnView(malia.cfg);';
         </td> </tr>
     </table>
 
+    <div>Incoming sound meter: <span id="meter"></span></div>
+
     <div class="learnTextPanel">
         <div class="auth alert alert-danger clearfix" role="alert">
             <div id="firebaseui-auth-container" class="pull-right"></div>
