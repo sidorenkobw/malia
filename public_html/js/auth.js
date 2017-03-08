@@ -23,6 +23,7 @@ class FirebaseProxy extends EventEmitter {
                 firebase.auth.GoogleAuthProvider.PROVIDER_ID,
             ],
             tosUrl: '<your-tos-url>', // TODO create terms of service URL
+            signInFlow: 'popup',
             callbacks: {
                 signInSuccess: function(user, credential, redirectUrl) {
                     handleSignedInUser(user);
@@ -64,6 +65,7 @@ class AuthView extends View {
         super();
         
         this.cfg = malia.cfg || {};
+        
         this.firebaseProxy = new FirebaseProxy(this.cfg.auth.firebase);
         this.firebaseProxy
             .setAuthContainerSelector("#firebaseui-auth-container")
@@ -72,9 +74,10 @@ class AuthView extends View {
             .on("error", this.onError.bind(this));
         
         this.firebaseProxy.init();
-            
-        this.$btnSignout = $(".btnSignout");
-        this.$btnSignout.on("click", this.onClickSignOut.bind(this));
+        
+        this.$authAlert = $(".alert.auth");
+        this.$btnSignout = $(".btnSignout")
+            .on("click", this.onClickSignOut.bind(this));
     }
     
     onClickSignOut(e) {
@@ -95,12 +98,14 @@ class AuthView extends View {
             providerData: user.providerData            
         });
         
+        this.$authAlert.addClass("hidden");
         this.$btnSignout.removeClass("hidden");
     }
     
     onSignOut(user) {
         this.emit("sign-out");
         
+        this.$authAlert.removeClass("hidden");
         this.$btnSignout.addClass("hidden");
         
         this.debug("Signed out");
