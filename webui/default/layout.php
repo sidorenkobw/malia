@@ -17,7 +17,7 @@
     
     <link href="<?php echo $this->cfg['libs']['bootstrap_css'] ?>" rel="stylesheet">
     <link href="/css/malia.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
-    <link href="/lib/bootstrap-notify/css/bootstrap-notify.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">';
+    <link href="/lib/bootstrap-notify/css/bootstrap-notify.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css">
 
     <?php echo $this->head_css ?>
