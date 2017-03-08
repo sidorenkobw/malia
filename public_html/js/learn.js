@@ -106,68 +106,11 @@ class Recorder {
     }
 }
 
-class FirebaseProxy {
-    constructor(cfg) {
-        if (!firebase) {
-            throw new Error("missing firebase.js");
-        }
-
-        firebase.initializeApp(cfg);
-
-        var uiConfig = {
-            signInSuccessUrl: 'learn.php',
-            signInOptions: [
-                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-            ],
-            tosUrl: '<your-tos-url>'
-        };
-
-        var ui = new firebaseui.auth.AuthUI(firebase.auth());
-
-        ui.start('#firebaseui-auth-container', uiConfig);
-
-        var initApp = function() {
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                    // User is signed in.
-                    user.getToken().then(function(accessToken) {
-                        document.getElementById('sign-in-status').textContent = 'Signed in';
-                        document.getElementById('sign-in').textContent = 'Sign out';
-                        console.log('firebase: signed in: ', {
-                            displayName: user.displayName,
-                            email: user.email,
-                            emailVerified: user.emailVerified,
-                            photoURL: user.photoURL,
-                            uid: user.uid,
-                            accessToken: accessToken,
-                            providerData: user.providerData
-                        });
-                    });
-                } else {
-                    // User is signed out.
-                    document.getElementById('sign-in-status').textContent = 'Signed out';
-                    document.getElementById('sign-in').textContent = 'Sign in';
-                    console.log('firebase: signed out');
-                }
-            }, function(error) {
-                console.log(error);
-            });
-        };
-        initApp();
-    }
-    upload(blob, path) {
-        var storage = firebase.storage();
-        var storageRef = storage.ref();
-        var ref = storageRef.child(path);
-        return ref.put(blob);
-    }
-}
-
 class LearnView extends View {
-    constructor(cfg) {
+    constructor(malia) {
         super();
         
-        this.cfg = cfg;
+        this.cfg = malia.cfg || {};
         
         /* idle|record|edit */
         this.mode = "idle";
@@ -177,7 +120,10 @@ class LearnView extends View {
         this.isFullscreenAuto = false;
         this.recordTimeout = 10000;
         this.recordTimer = null;
-        this.firebaseProxy = new FirebaseProxy(cfg.auth.firebase);
+        this.firebaseProxy = malia.auth.getProxy();
+        if (!this.firebaseProxy) {
+            throw new Error("AuthView is not initialized");
+        }
         this.recorder = new Recorder(this.firebaseProxy, document.querySelector("#meter"));
 
         this.initEls();

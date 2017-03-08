@@ -3,29 +3,16 @@
 $this->getLayout()->body_scripts .= '<script src="/lib/bootstrap-notify/js/bootstrap-notify.js?build=' . $this->cfg['build'] . '"></script>';
 $this->getLayout()->head_css .= '<link href="/lib/bootstrap-notify/css/bootstrap-notify.css?build=' . $this->cfg['build'] . '" rel="stylesheet">';
 
-$this->getLayout()->body_scripts .= '<script src="/js/view.js?build=' . $this->cfg['build'] . '"></script>';
 $this->getLayout()->body_scripts .= '<script src="/js/learn.js?build=' . $this->cfg['build'] . '"></script>';
 
-$this->getLayout()->js_init .= 'var app = new LearnView(malia.cfg);';
+$this->getLayout()->js_init .= 'var app = new LearnView(malia);';
 
 ?>
 
 <div class="notifications top-right"></div>
 
+
 <div id="learnApp">
-
-    <table border="8">
-        <tr><th>move me</th></tr>
-        <tr> <td>
-            
-        </td> </tr>
-        <tr> <td>
-            <div id="sign-in-status"></div>
-            <div id="sign-in"></div>
-            <div id="account-details"></div>
-        </td> </tr>
-    </table>
-
     <div>Incoming sound meter: <span id="meter"></span></div>
 
     <div class="learnTextPanel">

@@ -68,7 +68,7 @@ $menu = array(
                                 <a href="<?php echo $this->escape($item['url']) ?>"><?php echo $this->escape($item['title']) ?></a>
                             </li>
                         <?php endforeach; ?>
-                        <li><a href="#">Sign out</a></li>
+                        <li class="btnSignout hidden"><a href="#">Sign out</a></li>
                     </ul>
                 </div>
             </div>
@@ -87,16 +87,20 @@ $menu = array(
 <?php echo $this->body_before_scripts ?>
 
 <script src="<?php echo $this->cfg['libs']['jquery'] ?>"></script>
+<script src="<?php echo $this->cfg['libs']['bootstrap_js'] ?>"></script>
 
 <script src="/js/event-emitter.js?build=<?php echo $this->cfg['build'] ?>"></script>
+<script src="/js/view.js?build=<?php echo $this->cfg['build'] ?>"></script>
+<script src="/js/auth.js?build=<?php echo $this->cfg['build'] ?>"></script>
 
-<script src="<?php echo $this->cfg['libs']['bootstrap_js'] ?>"></script>
 <script>
     $(function () {
         var malia = {};
         malia.cfg = {
             'auth': <?php echo json_encode($this->cfg['auth']['federated']); ?>
         };
+        
+        malia.auth = new AuthView(malia);
         
         <?php echo $this->js_init ?>
     });
