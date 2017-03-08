@@ -14,7 +14,6 @@ $this->getLayout()->js_init .= 'var app = new LearnView(malia);';
 <div id="learnApp">
     <div class="learnTextPanel">
         <div class="auth alert alert-danger clearfix" role="alert">
-            <div id="firebaseui-auth-container" class="pull-right"></div>
             <span class="glyphicon glyphicon-warning-sign"></span> <strong>Warning!</strong> Learning is in demo mode. Audio recording 
                 is disabled for demonstration purpose. Please sign in to start actual learning.
         </div>

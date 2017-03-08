@@ -17,12 +17,17 @@
     
     <link href="<?php echo $this->cfg['libs']['bootstrap_css'] ?>" rel="stylesheet">
     <link href="/css/malia.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
-    
+    <link href="/lib/bootstrap-notify/css/bootstrap-notify.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">';
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css">
+
     <?php echo $this->head_css ?>
     
     <?php echo $this->head_after_css ?>
     
     <?php echo $this->head_before_scripts ?>
+    
+    <script src="https://www.gstatic.com/firebasejs/3.6.10/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
     
     <?php echo $this->head_scripts ?>
     
@@ -68,15 +73,18 @@ $menu = array(
                                 <a href="<?php echo $this->escape($item['url']) ?>"><?php echo $this->escape($item['title']) ?></a>
                             </li>
                         <?php endforeach; ?>
-                        <li class="btnSignout hidden"><a href="#">Sign out</a></li>
+                        <li class="btnSignin hidden"><a href="#">Sign In</a></li>
+                        <li class="btnSignout hidden"><a href="#">Sign Out</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
     </div>
 
+    <div id="firebaseui-auth-container"></div>
+    
     <?php echo $this->contents ?>
-
+    
     <footer class="footer">
         <p>&copy; 2017 Malia Speech</p>
     </footer>
@@ -90,6 +98,8 @@ $menu = array(
 <script src="<?php echo $this->cfg['libs']['bootstrap_js'] ?>"></script>
 
 <script src="/js/event-emitter.js?build=<?php echo $this->cfg['build'] ?>"></script>
+<script src="/lib/bootstrap-notify/js/bootstrap-notify.js?build=<?php echo $this->cfg['build'] ?>"></script>';
+
 <script src="/js/view.js?build=<?php echo $this->cfg['build'] ?>"></script>
 <script src="/js/auth.js?build=<?php echo $this->cfg['build'] ?>"></script>
 
@@ -105,10 +115,6 @@ $menu = array(
         <?php echo $this->js_init ?>
     });
 </script>
-
-<script src="https://www.gstatic.com/firebasejs/3.6.10/firebase.js"></script>
-<script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
-<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css">
 
 <?php echo $this->body_scripts ?>
 
