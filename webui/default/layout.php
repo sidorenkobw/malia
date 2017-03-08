@@ -98,7 +98,7 @@ $menu = array(
 <script src="<?php echo $this->cfg['libs']['bootstrap_js'] ?>"></script>
 
 <script src="/js/event-emitter.js?build=<?php echo $this->cfg['build'] ?>"></script>
-<script src="/lib/bootstrap-notify/js/bootstrap-notify.js?build=<?php echo $this->cfg['build'] ?>"></script>';
+<script src="/lib/bootstrap-notify/js/bootstrap-notify.js?build=<?php echo $this->cfg['build'] ?>"></script>
 
 <script src="/js/view.js?build=<?php echo $this->cfg['build'] ?>"></script>
 <script src="/js/auth.js?build=<?php echo $this->cfg['build'] ?>"></script>
