@@ -8,20 +8,18 @@
     <link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
   </head>
   <body>
-    <h1>learn</h1>
 
     <dom-module id="sounds-listing">
       <template>
         <iron-ajax url="sounds" auto last-response="{{listing}}"></iron-ajax>
-        <h2>Sounds</h2>
         <table>
-           <template is="dom-repeat" items="{{listing.sounds}}">
-             <tr>
-               <td>[[item.path]]</td>
-               <td>label: ...</td>
-               <td><audio src="sounds/[[item.path]]" controls preload="none"></audio></td>
-             </tr>
-           </template>
+          <template is="dom-repeat" items="{{listing.sounds}}">
+            <tr>
+              <td>[[item.path]]</td>
+              <td>label: ...</td>
+              <td><audio src="sounds/[[item.path]]" controls preload="none"></audio></td>
+            </tr>
+          </template>
         </table>
       </template>
       <script>
@@ -30,7 +28,46 @@
        });
       </script>
     </dom-module>
+
+    <dom-module id="train-model">
+      <template>
+        <iron-ajax id="request" method="put" url="train"  last-response="{{log}}"></iron-ajax>
+        <div><button on-click="onRetrain">Restart training</button></div>
+        <h3>Current status</h3>
+        <pre>
+          <template is="dom-repeat" items="{{lines}}">
+          [[item]]
+          </template>
+        </pre>
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "train-model",
+               properties: {
+                   lines: { type: Array, value: [] }
+               },
+               ready: function() {
+                   this.logEvents = new EventSource('train/logs');
+                   this.logEvents.addEventListener('line', function(ev) {
+                       this.push('lines', ev.data);
+                   }.bind(this));
+               },
+               onRetrain: function(ev) {
+                   this.$.request.generateRequest();
+               }
+           });
+       });
+      </script>
+    </dom-module>
     
+    <h1>learn</h1>
+    
+    
+    <h2>Sounds</h2>
     <sounds-listing></sounds-listing>
+
+    <h2>Train</h2>
+    <train-model></train-model>
   </body>
 </html>
