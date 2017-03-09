@@ -14,6 +14,7 @@ def load(path, hz=8000):
     """
     out = subprocess.check_output([
         'ffmpeg',
+        '-loglevel', '0',
         '-i', path,
         '-f', 'u8', # unsigned 8-bit output
         '-ar', str(hz), # resample
