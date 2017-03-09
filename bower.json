@@ -1,0 +1,7 @@
+{
+  "name": "malia",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.8.1",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.4.3"
+  }
+}
