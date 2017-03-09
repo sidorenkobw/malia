@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <title>learn</title>
+    <meta charset="utf-8">
+    <script src="lib/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="lib/bower_components/polymer/polymer.html">
+    <link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
+  </head>
+  <body>
+    <h1>learn</h1>
+
+    <dom-module id="sounds-listing">
+      <template>
+        <iron-ajax url="sounds" auto last-response="{{listing}}"></iron-ajax>
+        <h2>Sounds</h2>
+        <table>
+           <template is="dom-repeat" items="{{listing.sounds}}">
+             <tr>
+               <td>[[item.path]]</td>
+               <td>label: ...</td>
+               <td><audio src="sounds/[[item.path]]" controls preload="none"></audio></td>
+             </tr>
+           </template>
+        </table>
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({is: "sounds-listing"});
+       });
+      </script>
+    </dom-module>
+    
+    <sounds-listing></sounds-listing>
+  </body>
+</html>

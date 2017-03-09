@@ -1,7 +1,7 @@
 VIRTUALENV=virtualenv
 NPM=npm
 NODE=nodejs
-
+PHP=php
 
 init_virtualenv:
 	mkdir -p env
@@ -25,3 +25,10 @@ update_js_packages:
 update_bower_components:
 	mkdir -p public_html/lib/bower_components
 	$(NODE) node_modules/bower/bin/bower install
+
+run_learn_server:
+	env/bin/python learn/server.py
+
+run_php_server:
+	cd public_html
+	$(PHP) -S localhost:9999
