@@ -72,11 +72,60 @@ class FirebaseProxy extends EventEmitter {
     }
 }
 
+class User extends EventEmitter {
+    constructor(data, role) {
+        super();
+        
+        if (!data) {
+            role = null;
+        } else {
+            if (!("uid" in data)) {
+                throw new Error("Invalid user");
+            }
+            
+            this.data = data || {};
+            
+        }
+        
+        this.setRole(role || "guest");
+    }
+    
+    setRole(role) {
+        this.role = role;
+    }
+    
+    getRole() {
+        return this.role;
+    }
+    
+    get(attr) {
+        return this.data[attr] || null;
+    }
+    
+    getId() {
+        if (this.role == "guest") {
+            throw new Error("Guests don't have ids");
+        }
+        
+        if ("uid" in this.data) {
+            return this.data.uid;
+        } else {
+            throw new Error("No user id");
+        }
+    }
+}
+
 class AuthView extends View {
     constructor(malia) {
         super();
         
         this.cfg = malia.cfg || {};
+        
+        if (malia.debugLog) {
+            this.setDebugLog(malia.debugLog);
+        }
+        
+        this.initGuest();
         
         this.firebaseProxy = new FirebaseProxy(this.cfg.auth.firebase);
         this.firebaseProxy
@@ -92,15 +141,26 @@ class AuthView extends View {
             .on("click", this.onClickSignOut.bind(this));
     }
     
+    initGuest() {
+        this.user = new User();
+    }
+    
+    getUser() {
+        return this.user;
+    }
+    
+    getProxy() {
+        return this.firebaseProxy;
+    }
+    
     onClickSignOut(e) {
         e.preventDefault();
         this.firebaseProxy.signOut();
     }
     
     onSignIn(user) {
-        this.emit("sign-in");
-        this.debug("Signed in");
-        this.debug({
+        this.debug("Signed in", "log", "Auth");
+        this.user = new User({
             displayName: user.displayName,
             email: user.email,
             emailVerified: user.emailVerified,
@@ -109,27 +169,27 @@ class AuthView extends View {
             // accessToken: accessToken,
             providerData: user.providerData            
         });
+        this.user.setRole("authenticated");
+        this.debug(this.user, "log", "Auth");
         
         this.$authAlert.addClass("hidden");
         this.$btnSignout.removeClass("hidden");
+        
+        this.emit("sign-in");
     }
     
     onSignOut(user) {
-        this.emit("sign-out");
-        
+        this.initGuest();
         this.$authAlert.removeClass("hidden");
         this.$btnSignout.addClass("hidden");
         
-        this.debug("Signed out");
+        this.emit("sign-out");
+        this.debug("Signed out", "log", "Auth");
     }
     
     onError(e) {
         this.emit("error", e);
         this.debug(e);
         this.showNotification("danger", "Authentication error");
-    }
-    
-    getProxy() {
-        return this.firebaseProxy;
     }
 }

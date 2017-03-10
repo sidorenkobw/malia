@@ -29,12 +29,14 @@ class Meter {
     }
 }
 
-class Recorder {
-    constructor(firebaseProxy, meterElem) {
+class Recorder extends EventEmitter {
+    constructor(meterElem) {
+        super();
+        
         this.mimeType = 'audio/webm;codecs=opus';
         this.chunks = [];
         this.mediaRecorder = null;
-        this.firebaseProxy = firebaseProxy;
+        this._isRecording = false;
 
         // This makes the 'allow page to record?' permission appear.
         navigator.mediaDevices.getUserMedia({"audio": true, "video": false })
@@ -43,29 +45,35 @@ class Recorder {
                 this.mediaRecorder = new MediaRecorder(stream, {mimeType: this.mimeType});
 
                 this.mediaRecorder.ondataavailable = this._onData.bind(this);
+                this.mediaRecorder.onstart = this._onStart.bind(this);
                 this.mediaRecorder.onstop = this._onStop.bind(this);
 
                 this.mediaRecorder.onerror = (e) => {
-                    console.log('Error: ', e);
-                };
-
-                this.mediaRecorder.onstart = () => {
-                    console.log('Started, state = ' + this.mediaRecorder.state);
+                    this.debug(e, "error", "MediaRecorder");
                 };
 
                 this.mediaRecorder.onwarning = (e) => {
-                    console.log('Warning: ' + e);
+                    this.debug(e, "warning", "MediaRecorder");
                 };
             }).catch((err) => {
-                console.log('getUserMedia err', err);
+                // TODO handle this case
+                this.debug("getUserMedia failed", "error", "MediaRecorder");
             });
     }
 
-    startRecording() {
+    startRecording(word) {
         if (!this.mediaRecorder) {
             return;
         }
-        this.chunks = [];
+        
+        if (this.isRecording()) {
+            throw new Error("Recording is in progress");
+        }
+        
+        this.once("file-ready", ((blob) => {
+            this.emit("word-ready", {word: word, blob: blob});
+        }));
+        
         this.mediaRecorder.start(/*timeslice*/ 1000);
     }
 
@@ -73,36 +81,31 @@ class Recorder {
         if (!this.mediaRecorder) {
             return;
         }
-        this.mediaRecorder.stop();
+        
+        if (this.isRecording()) {
+            this.mediaRecorder.stop();
+        }
+    }
+
+    isRecording() {
+        return this._isRecording;
+    }
+    
+    _onStart() {
+        this._isRecording = true;
+        this.debug('Started, state = ' + this.mediaRecorder.state, "log", "MediaRecorder");
     }
 
     _onStop() {
-        var blob = new Blob(this.chunks, {type: this.mimeType});
-        this._uploadFirebase(blob);
+        this._isRecording = false;
+        this.emit("file-ready", new Blob(this.chunks, {type: this.mimeType}));
         this.chunks = [];
-    }
-
-    _uploadFirebase(blob) {
-        var path = 'incoming/sound-'+Date.now()+'.webm';
-        this.firebaseProxy.upload(blob, path).then(function(snapshot) {
-            console.log('Uploaded a blob or file!');
-        });
-    }
-
-    _uploadPost(blob) {
-        $.ajax({
-            type: "POST",
-            url: "audioRecordings",
-            contentType: this.mimeType,
-            processData: false,
-            data: blob,
-            success: () => {}
-        });
+        this.emit("stop");
     }
 
     _onData(ev) {
         this.chunks.push(ev.data);
-        console.log(`audio recording has ${this.chunks.length} chunks`);
+        this.debug(`audio recording has ${this.chunks.length} chunks`, "log", "MediaRecorder");
     }
 }
 
@@ -120,11 +123,21 @@ class LearnView extends View {
         this.isFullscreenAuto = false;
         this.recordTimeout = 10000;
         this.recordTimer = null;
-        this.firebaseProxy = malia.auth.getProxy();
-        if (!this.firebaseProxy) {
+        
+        if (malia.debugLog) {
+            this.setDebugLog(malia.debugLog);
+        }
+        
+        this.auth = malia.auth;
+        if (!this.auth) {
             throw new Error("AuthView is not initialized");
         }
-        this.recorder = new Recorder(this.firebaseProxy, document.querySelector("#meter"));
+        
+        this.recorder = new Recorder(document.querySelector("#meter"));
+        this.recorder.setDebugLog(this.debugLog);
+        this.recorder.on("word-ready", ((data) => {
+            this.uploadWord(data.word, data.blob);
+        }).bind(this));
 
         this.initEls();
         this.initEvents();
@@ -159,7 +172,6 @@ class LearnView extends View {
             
             "record-start":  this.onRecordStart,
             "record-stop":   this.onRecordStop,
-            "record-delete": this.onRecordDelete,
         };
         
         for (var event in events) {
@@ -205,27 +217,29 @@ class LearnView extends View {
         this.$btnToggleFullscreen.click(this.onClickToggleFullscreen.bind(this));
     }
     
+    getStorage() {
+        return this.auth.getProxy();
+    }
+    
     skipActiveWord() {
         this.emit("word-skip");
         
         if (this.mode == "record") {
             this.stopRecording();
-            this.deleteCurrentRecord();
         }
         
-        this.setActiveWord(this.activeWordIndex+1);
+        this.setActiveWord(this.activeWordIndex + 1);
     }
     
     switchActiveWord(i) {
         if (this.mode == "record") {
             this.stopRecording();
-            this.deleteCurrentRecord();
         }
         
         this.setActiveWord(i);
     }
     
-    setActiveWord(i) {
+    _setActiveWord(i) {
         if (this.$words.length == i) {
             this.setMode("idle");
             this.activeWordIndex = 0;
@@ -237,6 +251,15 @@ class LearnView extends View {
             if (this.mode == "record") {
                 this.startRecording();
             }
+        }        
+    }
+    
+    setActiveWord(i) {
+        // Change active word only after recording is stopped
+        if (this.recorder.isRecording()) {
+            this.recorder.once("stop", (() => { this._setActiveWord(i) }).bind(this));
+        } else {
+            this._setActiveWord(i);
         }
     }
     
@@ -318,15 +341,15 @@ class LearnView extends View {
     }
     
     onModeIdleOn() {
-        this.debug("Mode idle on");
+        this.debug("Mode idle on", "log", "LearnView_ModeChange");
     }
     
     onModeIdleOff() {
-        this.debug("Mode idle off");
+        this.debug("Mode idle off", "log", "LearnView_ModeChange");
     }
     
     onModeRecordOn() {
-        this.debug("Mode record on");
+        this.debug("Mode record on", "log", "LearnView_ModeChange");
         
         this.$btnToggleRecording
             .removeClass("btn-primary")
@@ -350,7 +373,7 @@ class LearnView extends View {
     }
     
     onModeRecordOff() {
-        this.debug("Mode record off");
+        this.debug("Mode record off", "log", "LearnView_ModeChange");
         
         this.$btnToggleRecording
             .addClass("btn-primary")
@@ -368,11 +391,10 @@ class LearnView extends View {
         }
         
         this.stopRecording();
-        this.deleteCurrentRecord();
     }
     
     onModeEditOn() {
-        this.debug("Mode edit on");
+        this.debug("Mode edit on", "log", "LearnView_ModeChange");
         
         this.$textEditor.show();
         this.$textContainer.hide();
@@ -386,7 +408,7 @@ class LearnView extends View {
     }
     
     onModeEditOff() {
-        this.debug("Mode edit off");
+        this.debug("Mode edit off", "log", "LearnView_ModeChange");
         
         this.$textEditor.hide();
         this.$textContainer.show();
@@ -416,21 +438,21 @@ class LearnView extends View {
     }
     
     onFullscreenOn() {
-        this.debug("Fullscreen on");
+        this.debug("Fullscreen on", "log", "LearnView");
         
         this.$app.addClass("fullscreen");
         this.$btnToggleFullscreen.addClass("btnChecked");
     }
     
     onFullscreenOff() {
-        this.debug("Fullscreen off");
+        this.debug("Fullscreen off", "log", "LearnView");
         
         this.$app.removeClass("fullscreen");
         this.$btnToggleFullscreen.removeClass("btnChecked");
     }
     
     onActiveWord() {
-        this.debug("Active word changed");
+        this.debug("Active word changed", "log", "LearnView");
         this.$words.removeClass("active");
         this.getActiveWordEl().addClass("active");
         this.scrollToActiveWord();
@@ -438,24 +460,22 @@ class LearnView extends View {
     
     onWordNext() {
         this.stopRecording();
-        this.uploadActiveWord(this.getActiveWordEl().text());
         this.setActiveWord(this.activeWordIndex+1);
     }
     
     onWordRetry() {
-        this.debug("Retry word");
+        this.debug("Retry word", "log", "LearnView");
         
         this.stopRecording();
-        this.deleteCurrentRecord();
         this.startRecording();
     }
     
     onWordSkip() {
-        this.debug("Skip word");
+        this.debug("Skip word", "log", "LearnView");
     }
     
     onRecordStart() {
-        this.debug("Start recording");
+        this.debug("Start recording", "log", "LearnView");
         
         this.scrollToActiveWord();
         this.recordTimer = setTimeout((function () {
@@ -465,12 +485,8 @@ class LearnView extends View {
         
     }
     onRecordStop() {
-        this.debug("Stop recording");
+        this.debug("Stop recording", "log", "LearnView");
         clearTimeout(this.recordTimer);
-    }
-    
-    onRecordDelete() {
-        this.debug("Delete current record");
     }
     
     getActiveWordEl() {
@@ -517,23 +533,51 @@ class LearnView extends View {
         this.$words = this.$textContainer.find("span");
         this.setActiveWord(0);
     }
-    
-    uploadActiveWord(word) {
-        this.debug("Upload word: " + word)
+        
+    uploadWord(word, record) {
+        // TODO handle cancel case
+        var user = this.auth.getUser();
+        
+        if (user.getRole() != "authenticated") {
+            this.showNotification("danger", "Guests are not allowed to save recordings. Record was not saved.");
+            return;
+        }
+        
+        this.debug("Upload started. Word: " + word, "log", "LearnView_Upload");
+        
+        //TODO sync with words db:
+        var path = "incoming/" + this.auth.getUser().getId() + "/" + escape(word) + "/" + Date.now() + ".webm";
+        
+        this.debug("Upload path: " + path, "log", "LearnView_Upload");
+        
+        if (!record) {
+            this.showNotification("danger", "Word was not uploaded");
+            this.debug("Error: Record is empty", "log", "LearnView_Upload");
+            return;
+        }
+        
+        this.debug(record, "log", "LearnView_Upload_Start");
+        
+        this.getStorage().upload(record, path).then((function(snapshot) {
+            this.debug("Done uploading of word: " + word + "to storage path: " + path, "log", "LearnView_Upload");
+        }).bind(this));
     }
     
     startRecording() {
-        this.recorder.startRecording();
+        var word = this.getActiveWordEl().text().toLowerCase();
+        if (!word || word == "") {
+            this.recorder.stopRecording();
+            this.showNotification("Danger", "Error: empty word");
+            return;
+        }
+        
+        this.recorder.startRecording(word);
         this.emit("record-start");
     }
     
     stopRecording() {
         this.recorder.stopRecording();
         this.emit("record-stop");
-    }
-    
-    deleteCurrentRecord() {
-        this.emit("record-delete");
     }
     
     textToHtml(text) {

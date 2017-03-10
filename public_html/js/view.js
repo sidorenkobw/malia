@@ -24,7 +24,5 @@ class View extends EventEmitter {
         }).bind(this), 300);
     }
     
-    debug(msg, level) {
-        console.log(msg)
-    }
+    run() {}
 }

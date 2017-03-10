@@ -110,6 +110,7 @@ $menu = array(
             'auth': <?php echo json_encode($this->cfg['auth']['federated']); ?>
         };
         
+        malia.debugLog = new DebugLog(malia);
         malia.auth = new AuthView(malia);
         
         <?php echo $this->js_init ?>
