@@ -6,14 +6,14 @@ PHP=php
 init_virtualenv:
 	mkdir -p env
 	$(VIRTUALENV) env
-	env/bin/pip install -f requirements.txt
+	env/bin/pip install -r requirements.txt
 
 # Login protocol. Writes to ~/.boto
 init_gsutil_auth:
 	env/bin/gsutil config
 
 update_virtualenv:
-	env/bin/pip install -f requirements.txt
+	env/bin/pip install -r requirements.txt
 
 sync_sound_files:
 	mkdir -p sounds
