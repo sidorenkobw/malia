@@ -8,6 +8,11 @@ init_virtualenv:
 	$(VIRTUALENV) env
 	env/bin/pip install -r requirements.txt
 
+# requirements.txt asks for a gpu-using tensorflow build. Follow with
+# this to downgrade to the cpu one.
+turn_off_tensorflow_gpu:
+	env/bin/pip install tensorflow
+
 # Login protocol. Writes to ~/.boto
 init_gsutil_auth:
 	env/bin/gsutil config
