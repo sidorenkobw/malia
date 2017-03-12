@@ -6,6 +6,18 @@
     <script src="lib/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
     <link rel="import" href="lib/bower_components/polymer/polymer.html">
     <link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
+    <style>
+     h1 {
+         text-align: center;
+         background: #f3c162;
+         padding: 4px 2px;
+     }
+     h2 {
+         background: #f3d8a5;
+         padding: 4px 2px;
+     }
+     details > summary > h2 { display: inline-block; }
+    </style>
   </head>
   <body>
 
@@ -31,7 +43,7 @@
 
     <dom-module id="train-model">
       <template>
-        <iron-ajax id="request" method="put" url="train"  last-response="{{log}}"></iron-ajax>
+        <iron-ajax id="request" method="put" url="train/restart"  last-response="{{log}}"></iron-ajax>
         <div><button on-click="onRetrain">Restart training</button></div>
         <h3>Current status</h3>
         <pre>
@@ -49,9 +61,11 @@
                },
                ready: function() {
                    this.logEvents = new EventSource('train/logs');
-                   this.logEvents.addEventListener('line', function(ev) {
+                   this.logEvents.addEventListener('clear', (ev) => { this.lines = []; })
+                   this.logEvents.addEventListener('line', (ev) => {
                        this.push('lines', ev.data);
-                   }.bind(this));
+                       this.splice('lines', 0, this.lines.length - 10);
+                   });
                },
                onRetrain: function(ev) {
                    this.$.request.generateRequest();
@@ -63,11 +77,14 @@
     
     <h1>learn</h1>
     
-    
-    <h2>Sounds</h2>
-    <sounds-listing></sounds-listing>
+    <details>
+      <summary><h2>Sounds</h2></summary>
+      <sounds-listing></sounds-listing>
+    </details>
 
-    <h2>Train</h2>
-    <train-model></train-model>
+    <details open>
+      <summary><h2>Train</h2></summary>
+      <train-model></train-model>
+    </details>
   </body>
 </html>
