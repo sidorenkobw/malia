@@ -24,6 +24,8 @@
     <dom-module id="sounds-listing">
       <template>
         <iron-ajax url="sounds" auto last-response="{{listing}}"></iron-ajax>
+        <iron-ajax id="sync" url="sounds/sync" method="PUT"></iron-ajax>
+        <div>Listing sounds on {{listing.hostname}}. <button on-click="resync">Resync with Firebase</button> {{syncStatus}}</div>
         <table>
           <template is="dom-repeat" items="{{listing.sounds}}">
             <tr>
@@ -36,7 +38,18 @@
       </template>
       <script>
        HTMLImports.whenReady(function () {
-           Polymer({is: "sounds-listing"});
+           Polymer({
+               is: "sounds-listing",
+               ready: function() {
+                   this.$.sync.addEventListener('response', (ev) => {
+                       this.syncStatus = "done";
+                   });
+               },
+               resync: function() {
+                   this.$.sync.generateRequest();
+                   this.syncStatus = 'requested...';
+               }
+           });
        });
       </script>
     </dom-module>

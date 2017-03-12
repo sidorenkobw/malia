@@ -1,18 +1,35 @@
 """
 Web server for driving training and testing remotely.
 """
-import sys, time
+import sys, time, socket
 import cyclone.web, cyclone.sse
 from twisted.internet import reactor, defer, task
 from twisted.python import log
 from twisted.python.filepath import FilePath
+from twisted.internet import protocol
 
 import train
 
 class SoundListing(cyclone.web.RequestHandler):
     def get(self):
         top = FilePath('sounds')
-        self.write({'sounds': [{'path': '/'.join(p.segmentsFrom(top))} for p in sorted(top.walk()) if p.isfile()]})
+        self.write({
+            'sounds': [{'path': '/'.join(p.segmentsFrom(top))} for p in sorted(top.walk()) if p.isfile()],
+            'hostname': socket.gethostname(),
+        })
+
+class SoundsSync(cyclone.web.RequestHandler):
+    @cyclone.web.asynchronous
+    def put(self):
+        req = self
+        class StreamOutput(protocol.ProcessProtocol):
+            def outReceived(self, data):
+                req.write(data)
+            def errReceived(self, data):
+                req.write(data)
+            def processEnded(self, status):
+                req.finish()
+        reactor.spawnProcess(StreamOutput(), 'make', ['/usr/bin/make', 'sync_sound_files'])
 
 class TrainRestart(cyclone.web.RequestHandler):
     def put(self):
@@ -67,6 +84,7 @@ reactor.listenTCP(
          {"path": "learn", "default_filename": "index.html"}),
         (r'/lib/(.*)', cyclone.web.StaticFileHandler, {"path": "public_html/lib"}),
         (r'/sounds', SoundListing),
+        (r'/sounds/sync', SoundsSync),
         (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler, {"path": "sounds"}),
         (r'/train/restart', TrainRestart),
         (r'/train/logs', TrainLogs),
