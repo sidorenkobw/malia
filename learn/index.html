@@ -57,8 +57,9 @@
 
     <dom-module id="train-model">
       <template>
-        <iron-ajax id="request" method="put" url="train/restart"  last-response="{{log}}"></iron-ajax>
+        <iron-ajax id="request" method="put" url="train/restart"  last-response="{{log}}" last-error="{{err}}"></iron-ajax>
         <div><button on-click="onRetrain">Restart training</button></div>
+        <pre>[[err.request.xhr.response.exc]]</pre>
         <h3>Current status</h3>
         <pre>
           <template is="dom-repeat" items="{{lines}}">

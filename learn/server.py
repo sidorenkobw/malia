@@ -1,7 +1,7 @@
 """
 Web server for driving training and testing remotely.
 """
-import sys, time, socket, json
+import sys, time, socket, json, traceback
 import cyclone.web, cyclone.sse
 from twisted.internet import reactor, defer, task
 from twisted.python import log
@@ -42,8 +42,13 @@ class SoundsSync(cyclone.web.RequestHandler):
 
 class TrainRestart(cyclone.web.RequestHandler):
     def put(self):
-        self.settings.trainRunner.restart()
-        self.finish()
+        try:
+            self.settings.trainRunner.restart()
+        except Exception:
+            self.set_status(500)
+            self.write({'exc': traceback.format_exc()})
+            return
+
 
 _logWatchers = {} # values are SSEHandler objects with sendEvent method
         
@@ -92,6 +97,7 @@ class TrainRunner(object):
                 sendEvent({'type': 'set_model'})
             def set_params(self, params):
                 sendEvent({'type': 'set_params', 'params': params})
+        reload(train)
         train.train(out_weights='weights.h5', callback=Cb())
 
     def set_model(self, *a, **kw):
