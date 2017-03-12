@@ -1,14 +1,23 @@
 """
 Web server for driving training and testing remotely.
 """
-import sys, time, socket
+import sys, time, socket, json
 import cyclone.web, cyclone.sse
 from twisted.internet import reactor, defer, task
 from twisted.python import log
 from twisted.python.filepath import FilePath
 from twisted.internet import protocol
+import numpy
 
 import train
+import keras.callbacks
+
+def _default(obj):
+    if isinstance(obj, numpy.number):
+        return json.dumps(round(float(obj), ndigits=6))
+    return json.JSONEncoder.default(_enc, obj)
+_enc = json.JSONEncoder(default=_default)
+encodeJsonIncludingNumpyTypes = _enc.encode
 
 class SoundListing(cyclone.web.RequestHandler):
     def get(self):
@@ -46,8 +55,8 @@ class TrainLogs(cyclone.sse.SSEHandler):
 
     def resync(self):
         self.sendEvent(event='clear', message='')
-        for line in self.settings.trainRunner.recentLogs:
-            self.sendEvent(event='line', message=line)
+        for (ev, msg) in self.settings.trainRunner.recentLogs:
+            self.sendEvent(event=ev, message=msg)
         
     def unbind(self):
         del _logWatchers[self.key]
@@ -56,11 +65,37 @@ class TrainLogs(cyclone.sse.SSEHandler):
 class TrainRunner(object):
     def __init__(self):
         self.recentLogs = []
-        task.LoopingCall(self.fake).start(1)
+        self.sendEvent('line', {'line': 'TrainRunner initialized'})
 
-
+    def sendEvent(self, event, messageDict):
+        message = encodeJsonIncludingNumpyTypes(messageDict)
+        self.recentLogs = self.recentLogs[-100:] + [(event, message)]
+        for lw in _logWatchers.values():
+            lw.sendEvent(event=event, message=message)
+        
     def restart(self):
-        train.train(self.onStep)
+        sendEvent = lambda d: self.sendEvent('callback', d)
+        class Cb(keras.callbacks.Callback):
+            def on_batch_begin(self, batch, logs=None):
+                sendEvent({'type': 'batch_begin', 'batch': batch, 'logs': logs})
+            def on_batch_end(self, batch, logs=None):
+                sendEvent({'type': 'batch_end', 'batch': batch, 'logs': logs})
+            def on_epoch_begin(self, epoch, logs=None):
+                sendEvent({'type': 'epoch_begin', 'epoch': epoch, 'logs': logs})
+            def on_epoch_end(self, epoch, logs=None):
+                sendEvent({'type': 'epoch_end', 'epoch': epoch, 'logs': logs})
+            def on_train_begin(self, logs=None):
+                sendEvent({'type': 'train_begin', 'logs': logs})
+            def on_train_end(self, logs=None):
+                sendEvent({'type': 'train_end', 'logs': logs})
+            def set_model(self, model):
+                sendEvent({'type': 'set_model'})
+            def set_params(self, params):
+                sendEvent({'type': 'set_params', 'params': params})
+        train.train(out_weights='weights.h5', callback=Cb())
+
+    def set_model(self, *a, **kw):
+        print "set_model", a, kw
 
     def cancel(self):
         raise
@@ -68,15 +103,9 @@ class TrainRunner(object):
     def onStep(self, lg):
         print 'step', lg
         
-    def fake(self):
-        line = 'line %s' % time.time()
-        self.recentLogs = self.recentLogs[-10:] + [line]
-        for lw in _logWatchers.values():
-            lw.sendEvent(event='line', message=line)
-
 
 trainRunner = TrainRunner()
-log.startLogging(sys.stderr)
+#log.startLogging(sys.stderr)
 reactor.listenTCP(
     9990,
     cyclone.web.Application([

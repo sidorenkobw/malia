@@ -77,8 +77,13 @@
                    this.logEvents.addEventListener('clear', (ev) => { this.lines = []; })
                    this.logEvents.addEventListener('line', (ev) => {
                        this.push('lines', ev.data);
-                       this.splice('lines', 0, this.lines.length - 10);
+                       this.splice('lines', 0, this.lines.length - 100);
                    });
+                   this.logEvents.addEventListener('callback', (ev) => {
+                       this.push('lines', ev.data);
+                       this.splice('lines', 0, this.lines.length - 100);
+                   });
+                   
                },
                onRetrain: function(ev) {
                    this.$.request.generateRequest();

@@ -11,7 +11,7 @@ from speechmodel import makeModel
 from loader import load
 import keras.callbacks
 
-def train(out_weights='weights.h5'):
+def train(callback=None, out_weights='weights.h5'):
     model = makeModel()
 
     model.compile(loss='mean_squared_error',
@@ -29,7 +29,7 @@ def train(out_weights='weights.h5'):
 
     tb = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True)
 
-    model.fit(x, y,  batch_size=32, nb_epoch=10, validation_split=.34, callbacks=[tb])
+    model.fit(x, y,  batch_size=32, nb_epoch=10, validation_split=.34, callbacks=[tb] + ([callback] if callback else []))
     model.save_weights(out_weights)
 
 
