@@ -7,18 +7,17 @@ https://github.com/coopie/speech_ml/blob/master/speech_ml/waveform_tools.py nump
 """
 import numpy
 
-from speechmodel import makeModel
+import speechmodel
 from loader import load
 import keras.callbacks
 
-def train(out_weights='weights.h5'):
-    model = makeModel()
+def train(callback=None, out_weights='weights.h5'):
+    reload(speechmodel)
+    model = speechmodel.makeModel()
 
     model.compile(loss='mean_squared_error',
                   optimizer='rmsprop',
                   metrics=['accuracy'])
-    for lyr in model.layers:
-        print lyr.input_shape, lyr.output_shape
 
     x = numpy.array([load('sounds/incoming/sound-1488957441246.webm')[:100],
                      load('sounds/incoming/sound-1488957653394.webm')[:100],
@@ -29,8 +28,18 @@ def train(out_weights='weights.h5'):
 
     tb = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True)
 
-    model.fit(x, y,  batch_size=32, nb_epoch=10, validation_split=.34, callbacks=[tb])
+    callbacks = []
+    #callbacks.append(keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True))
+    if callback:
+        callbacks.append(callback)
+    
+    model.fit(x, y, batch_size=100, nb_epoch=50, validation_split=.34,
+              callbacks=callbacks)
+
+    model.fit(x, y,  batch_size=32, nb_epoch=10, validation_split=.34, callbacks=[tb] + ([callback] if callback else []))
     model.save_weights(out_weights)
+    if callback:
+        callback.on_save(out_weights)
 
 
 if __name__ == '__main__':

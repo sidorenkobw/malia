@@ -4,3 +4,4 @@ tensorflow_gpu==1.0.1
 keras==1.2.2
 h5py==2.6.0
 cyclone==1.1
+service-identity==16.0.0

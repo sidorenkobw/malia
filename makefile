@@ -6,14 +6,19 @@ PHP=php
 init_virtualenv:
 	mkdir -p env
 	$(VIRTUALENV) env
-	env/bin/pip install -f requirements.txt
+	env/bin/pip install -r requirements.txt
+
+# requirements.txt asks for a gpu-using tensorflow build. Follow with
+# this to downgrade to the cpu one.
+turn_off_tensorflow_gpu:
+	env/bin/pip install tensorflow
 
 # Login protocol. Writes to ~/.boto
 init_gsutil_auth:
 	env/bin/gsutil config
 
 update_virtualenv:
-	env/bin/pip install -f requirements.txt
+	env/bin/pip install -r requirements.txt
 
 sync_sound_files:
 	mkdir -p sounds
