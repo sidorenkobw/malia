@@ -68,6 +68,10 @@
         <div><button on-click="onRetrain">Restart training</button></div>
         <pre>[[err.request.xhr.response.exc]]</pre>
         <h3>Current status</h3>
+        <div>Prepared sound: <paper-progress style="display: inline-block"
+                                             min="0"
+                                             max="[[sound_total]]"
+                                             value="[[sound_cur]]"></paper-progress></div>
         <div>Epoch: <paper-progress style="display: inline-block"
                                     min="0"
                                     max="[[epoch_total]]"
@@ -92,11 +96,14 @@
            Polymer({
                is: "train-model",
                properties: {
+                   err: { type: Object },
                    lines: { type: Array, value: [] },
                    epoch_cur: {type: Number, notify: true},
                    epoch_total: {type: Number, notify: true},
                    batch_cur: {type: Number, notify: true},
                    batch_total: {type: Number, notify: true},
+                   sound_cur: {type: Number, notify: true},
+                   sound_total: {type: Number, notify: true},
                    acc: {type: Number, notify: true},
                    loss: {type: Number, notify: true},
                    val_acc: {type: Number, notify: true},
@@ -125,13 +132,15 @@
                            }]
                        }
                    };
+                   // from https://bl.ocks.org/mbostock/raw/5577023/
+                   let set2 = ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f","#e5c494","#b3b3b3"];
                    this.chartData = {
                        labels: [],
                        datasets: [
-                           {label: "loss", data: []},
-                           {label: "acc", data: []},
-                           {label: "val_loss", data: []},
-                           {label: "val_acc", data: []},
+                           {label: "loss", data: [], fill: false, borderColor: set2[0]},
+                           {label: "acc", data: [], fill: false, borderColor: set2[1]},
+                           {label: "val_loss", data: [], fill: false, borderColor: set2[2]},
+                           {label: "val_acc", data: [], fill: false, borderColor: set2[3]},
                        ]
                    };
                },
@@ -173,6 +182,7 @@
                    this.splice('lines', 0, this.lines.length - this.maxLinesStored);
                },
                onRetrain: function(ev) {
+                   this.err = null;
                    this.$.request.generateRequest();
                }
            });
