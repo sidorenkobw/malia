@@ -1,5 +1,9 @@
 import subprocess
 import numpy
+from twisted.python.filepath import FilePath
+from cachetools import LRUCache
+
+_files = LRUCache(maxsize=100)
 
 def load(path, hz=8000):
     """
@@ -12,7 +16,13 @@ def load(path, hz=8000):
     ... dynaudnorm  Dynamic Audio Normalizer. https://ffmpeg.org/ffmpeg-filters.html#dynaudnorm
 
     """
-    out = subprocess.check_output([
+    if isinstance(path, FilePath):
+        path = path.path
+
+    if path in _files:
+        return _files[path]
+
+    raw = subprocess.check_output([
         'ffmpeg',
         '-loglevel', '0',
         '-i', path,
@@ -21,8 +31,9 @@ def load(path, hz=8000):
         '-af', 'dynaudnorm=f=50',
         'pipe:1' # write to stdout
         ])
-    return numpy.fromstring(out, dtype=numpy.uint8)
-
+    out = numpy.fromstring(raw, dtype=numpy.uint8)
+    _files[path] = out
+    return out
 
 if __name__ == '__main__':
     for x in load('sounds/incoming/sound-1488959248054.webm')[::200]:
