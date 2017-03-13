@@ -6,6 +6,8 @@
     <script src="lib/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
     <link rel="import" href="lib/bower_components/polymer/polymer.html">
     <link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="lib/bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="lib/bower_components/chart-elements/chart-line.html">
     <style>
      h1 {
          text-align: center;
@@ -57,10 +59,28 @@
 
     <dom-module id="train-model">
       <template>
-        <iron-ajax id="request" method="put" url="train/restart"  last-response="{{log}}" last-error="{{err}}"></iron-ajax>
+        <style>
+          #chart { width: 80%; height: 250px; }
+        </style>
+        <iron-ajax id="request" method="put" url="train/restart"
+                   last-response="{{log}}"
+                   last-error="{{err}}"></iron-ajax>
         <div><button on-click="onRetrain">Restart training</button></div>
         <pre>[[err.request.xhr.response.exc]]</pre>
         <h3>Current status</h3>
+        <div>Epoch: <paper-progress style="display: inline-block"
+                                    min="0"
+                                    max="[[epoch_total]]"
+                                    value="[[epoch_cur]]"></paper-progress></div>
+        <div>Batch: <paper-progress style="display: inline-block"
+                                    min="0"
+                                    max="[[batch_total]]"
+                                    value="[[batch_cur]]"></paper-progress></div>
+        <div>
+          <chart-line id="chart"
+                      data="[[chartData]]"
+                      options="[[chartOptions]]"></chart-line>
+        </div>
         <pre>
           <template is="dom-repeat" items="{{lines}}">
           [[item]]
@@ -72,20 +92,85 @@
            Polymer({
                is: "train-model",
                properties: {
-                   lines: { type: Array, value: [] }
+                   lines: { type: Array, value: [] },
+                   epoch_cur: {type: Number, notify: true},
+                   epoch_total: {type: Number, notify: true},
+                   batch_cur: {type: Number, notify: true},
+                   batch_total: {type: Number, notify: true},
+                   acc: {type: Number, notify: true},
+                   loss: {type: Number, notify: true},
+                   val_acc: {type: Number, notify: true},
+                   val_loss: {type: Number, notify: true},
+                   chartData: {type: Object},
+                   chartOptions: {type: Object},
                },
                ready: function() {
+                   this.resetChart();
                    this.logEvents = new EventSource('train/logs');
-                   this.logEvents.addEventListener('clear', (ev) => { this.lines = []; })
-                   this.logEvents.addEventListener('line', (ev) => {
-                       this.push('lines', ev.data);
-                       this.splice('lines', 0, this.lines.length - 100);
-                   });
-                   this.logEvents.addEventListener('callback', (ev) => {
-                       this.push('lines', ev.data);
-                       this.splice('lines', 0, this.lines.length - 100);
-                   });
-                   
+                   this.logEvents.addEventListener('clear', this.onLogClear.bind(this));
+                   this.logEvents.addEventListener('line', this.onLogLine.bind(this));
+
+                   this.maxLinesStored = 1000;
+                   this.logEvents.addEventListener('callback', this.onLogCallback.bind(this));
+
+               },
+               resetChart: function() {
+                   // http://www.chartjs.org/docs/
+                   Chart.defaults.global.animation.duration = 0;
+                   this.chartOptions = {
+                       maintainAspectRatio: false,
+                       scales: {
+                           xAxes: [{
+                               scaleLabel: 'epoch',
+                           }]
+                       }
+                   };
+                   this.chartData = {
+                       labels: [],
+                       datasets: [
+                           {label: "loss", data: []},
+                           {label: "acc", data: []},
+                           {label: "val_loss", data: []},
+                           {label: "val_acc", data: []},
+                       ]
+                   };
+               },
+               addChartEpoch: function(epoch, params) {
+                   this.chartData.labels.push(epoch);
+                   this.chartData.datasets[0].data.push(params.loss);
+                   this.chartData.datasets[1].data.push(params.acc);
+                   this.chartData.datasets[2].data.push(params.val_loss);
+                   this.chartData.datasets[3].data.push(params.val_acc);
+                   this.$.chart.updateChart();
+               },
+               onLogClear: function(ev) {
+                   this.lines = [];
+                   this.resetChart();
+               },
+               onLogLine: function(ev) {
+                   this.push('lines', ev.data);
+                   this.splice('lines', 0, this.lines.length - 100);
+               },
+               onLogCallback: function(ev) {
+                   let msg = JSON.parse(ev.data);
+                   if (msg.type == 'epoch_end') {
+                       this.addChartEpoch(msg.params.epoch_cur - 1,msg.params);
+                       // fall through to params
+                   }
+                   if (msg.params) {
+                       for (let k in msg.params) {
+                           this[k] = msg.params[k];
+                       }
+                       return;
+                   }
+                   if (msg.type == 'train_begin') {
+                       this.resetChart();
+                       this.lines = [];
+                       return;
+                   }
+
+                   this.push('lines', ev.data);
+                   this.splice('lines', 0, this.lines.length - this.maxLinesStored);
                },
                onRetrain: function(ev) {
                    this.$.request.generateRequest();

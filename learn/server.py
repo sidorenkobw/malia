@@ -77,38 +77,48 @@ class TrainRunner(object):
         self.recentLogs = self.recentLogs[-100:] + [(event, message)]
         for lw in _logWatchers.values():
             lw.sendEvent(event=event, message=message)
+            lw.transport.doWrite()
         
     def restart(self):
         sendEvent = lambda d: self.sendEvent('callback', d)
+        params = {
+            'epoch_cur': 0, 'epoch_total': 0,
+            'batch_cur': 0, 'batch_total': 5,
+            'acc': 0,
+            'loss': 1,
+            'val_acc': 0,
+            'val_loss': 1,
+        }
         class Cb(keras.callbacks.Callback):
-            def on_batch_begin(self, batch, logs=None):
-                sendEvent({'type': 'batch_begin', 'batch': batch, 'logs': logs})
-            def on_batch_end(self, batch, logs=None):
-                sendEvent({'type': 'batch_end', 'batch': batch, 'logs': logs})
-            def on_epoch_begin(self, epoch, logs=None):
-                sendEvent({'type': 'epoch_begin', 'epoch': epoch, 'logs': logs})
-            def on_epoch_end(self, epoch, logs=None):
-                sendEvent({'type': 'epoch_end', 'epoch': epoch, 'logs': logs})
-            def on_train_begin(self, logs=None):
-                sendEvent({'type': 'train_begin', 'logs': logs})
-            def on_train_end(self, logs=None):
-                sendEvent({'type': 'train_end', 'logs': logs})
             def set_model(self, model):
-                sendEvent({'type': 'set_model'})
-            def set_params(self, params):
+                pass#sendEvent({'type': 'set_model'})
+            def set_params(self, train_params):
+                params['epoch_cur'] = 0
+                params['epoch_total'] = train_params['nb_epoch']
                 sendEvent({'type': 'set_params', 'params': params})
+            def on_train_begin(self, logs=None):
+                sendEvent({'type': 'train_begin'})
+            def on_train_end(self, logs=None):
+                sendEvent({'type': 'train_end'})
+            def on_epoch_begin(self, epoch, logs=None):
+                sendEvent({'params': params})
+            def on_epoch_end(self, epoch, logs=None):
+                params['epoch_cur'] = epoch + 1
+                params.update(logs)
+                sendEvent({'params': params, 'type': 'epoch_end'})
+            def on_batch_end(self, batch, logs=None):
+                params['batch_cur'] = batch + 1
+                params['acc'] = logs['acc']
+                params['loss'] = logs['loss']
+                sendEvent({'params': params})
+            def on_save(self, path):
+                sendEvent({'type': 'save', 'path': path})
         reload(train)
         train.train(out_weights='weights.h5', callback=Cb())
-
-    def set_model(self, *a, **kw):
-        print "set_model", a, kw
-
+        
     def cancel(self):
         raise
 
-    def onStep(self, lg):
-        print 'step', lg
-        
 
 trainRunner = TrainRunner()
 #log.startLogging(sys.stderr)
