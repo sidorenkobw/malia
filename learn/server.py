@@ -15,6 +15,8 @@ import keras.callbacks
 def _default(obj):
     if isinstance(obj, numpy.number):
         return json.dumps(round(float(obj), ndigits=6))
+    if isinstance(obj, FilePath):
+        return json.dumps(obj.path)
     return json.JSONEncoder.default(_enc, obj)
 _enc = json.JSONEncoder(default=_default)
 encodeJsonIncludingNumpyTypes = _enc.encode
@@ -82,6 +84,7 @@ class TrainRunner(object):
     def restart(self):
         sendEvent = lambda d: self.sendEvent('callback', d)
         params = {
+            'sound_cur': 0, 'sound_total': 0,
             'epoch_cur': 0, 'epoch_total': 0,
             'batch_cur': 0, 'batch_total': 5,
             'acc': 0,
@@ -90,6 +93,10 @@ class TrainRunner(object):
             'val_loss': 1,
         }
         class Cb(keras.callbacks.Callback):
+            def loaded_sound(self, cur, total):
+                params['sound_cur'] = cur
+                params['sound_total'] = total
+                sendEvent({'params': params})
             def set_model(self, model):
                 pass#sendEvent({'type': 'set_model'})
             def set_params(self, train_params):
@@ -127,10 +134,14 @@ reactor.listenTCP(
     cyclone.web.Application([
         (r'/()', cyclone.web.StaticFileHandler,
          {"path": "learn", "default_filename": "index.html"}),
-        (r'/lib/(.*)', cyclone.web.StaticFileHandler, {"path": "public_html/lib"}),
+        (r'/([^/]+\.html)', cyclone.web.StaticFileHandler,
+         {"path": "learn"}),
+        (r'/lib/(.*)', cyclone.web.StaticFileHandler,
+         {"path": "public_html/lib"}),
         (r'/sounds', SoundListing),
         (r'/sounds/sync', SoundsSync),
-        (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler, {"path": "sounds"}),
+        (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler,
+         {"path": "sounds"}),
         (r'/train/restart', TrainRestart),
         (r'/train/logs', TrainLogs),
     ], trainRunner=trainRunner))

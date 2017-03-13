@@ -1,0 +1,40 @@
+<link rel="import" href="lib/bower_components/polymer/polymer.html">
+<link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="sounds-listing">
+  <template>
+    <iron-ajax id="sounds" url="sounds" auto
+               last-response="{{listing}}"></iron-ajax>
+    <iron-ajax id="sync" url="sounds/sync" method="PUT"></iron-ajax>
+    <div>
+      Listing sounds on {{listing.hostname}}.
+      <button on-click="resync">Resync with Firebase</button>
+      {{syncStatus}}
+    </div>
+    <table>
+      <template is="dom-repeat" items="{{listing.sounds}}">
+        <tr>
+          <td>[[item.path]]</td>
+          <td>label: ...</td>
+          <td><audio src="sounds/[[item.path]]" controls
+                     preload="none"></audio></td>
+        </tr>
+      </template>
+    </table>
+  </template>
+  <script>
+   Polymer({
+       is: "sounds-listing",
+       ready: function() {
+           this.$.sync.addEventListener('response', (ev) => {
+               this.syncStatus = "done";
+               this.$.sounds.generateRequest();
+           });
+       },
+       resync: function() {
+           this.$.sync.generateRequest();
+           this.syncStatus = 'requested...';
+       }
+   });
+  </script>
+</dom-module>
