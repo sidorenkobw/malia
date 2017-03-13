@@ -82,7 +82,27 @@ class Recorder extends EventEmitter {
             return;
         }
         
+        if (!this.isRecording()) {
+            throw new Error("Recorder is not active");
+        }
+        
+        this.once("data-ready", (function (data) {
+            this.emit("file-ready", data);
+        }).bind(this));
+        this.mediaRecorder.stop();
+    }
+    
+    cancelRecording(callback) {
+        if (!this.mediaRecorder) {
+            return;
+        }
+        
+        this.off("file-ready");
+        
         if (this.isRecording()) {
+            if (callback) {
+                this.once("stop", callback);
+            }
             this.mediaRecorder.stop();
         }
     }
@@ -98,7 +118,7 @@ class Recorder extends EventEmitter {
 
     _onStop() {
         this._isRecording = false;
-        this.emit("file-ready", new Blob(this.chunks, {type: this.mimeType}));
+        this.emit("data-ready", new Blob(this.chunks, {type: this.mimeType}));
         this.chunks = [];
         this.emit("stop");
     }
@@ -168,10 +188,7 @@ class LearnView extends View {
             "word-next":   this.onWordNext,
             "word-retry":  this.onWordRetry,
             "word-skip":   this.onWordSkip,
-            "active-word": this.onActiveWord,
-            
-            "record-start":  this.onRecordStart,
-            "record-stop":   this.onRecordStop,
+            "active-word": this.onActiveWord
         };
         
         for (var event in events) {
@@ -225,7 +242,7 @@ class LearnView extends View {
         this.emit("word-skip");
         
         if (this.mode == "record") {
-            this.stopRecording();
+            this.cancelRecording();
         }
         
         this.setActiveWord(this.activeWordIndex + 1);
@@ -233,7 +250,7 @@ class LearnView extends View {
     
     switchActiveWord(i) {
         if (this.mode == "record") {
-            this.stopRecording();
+            this.cancelRecording();
         }
         
         this.setActiveWord(i);
@@ -390,7 +407,7 @@ class LearnView extends View {
             this.setFullscreen(false);
         }
         
-        this.stopRecording();
+        this.cancelRecording();
     }
     
     onModeEditOn() {
@@ -466,27 +483,13 @@ class LearnView extends View {
     onWordRetry() {
         this.debug("Retry word", "log", "LearnView");
         
-        this.stopRecording();
-        this.startRecording();
+        this.cancelRecording((function () {
+            this.startRecording();
+        }).bind(this));
     }
     
     onWordSkip() {
         this.debug("Skip word", "log", "LearnView");
-    }
-    
-    onRecordStart() {
-        this.debug("Start recording", "log", "LearnView");
-        
-        this.scrollToActiveWord();
-        this.recordTimer = setTimeout((function () {
-            this.setMode("idle");
-            this.showNotification("danger", "Recording timeout");
-        }).bind(this), this.recordTimeout);
-        
-    }
-    onRecordStop() {
-        this.debug("Stop recording", "log", "LearnView");
-        clearTimeout(this.recordTimer);
     }
     
     getActiveWordEl() {
@@ -566,18 +569,31 @@ class LearnView extends View {
     startRecording() {
         var word = this.getActiveWordEl().text().toLowerCase();
         if (!word || word == "") {
-            this.recorder.stopRecording();
+            this.recorder.cancelRecording();
             this.showNotification("Danger", "Error: empty word");
             return;
         }
         
         this.recorder.startRecording(word);
-        this.emit("record-start");
+        this.debug("Start recording word: " + word, "log", "LearnView");
+        
+        this.scrollToActiveWord();
+        this.recordTimer = setTimeout((function () {
+            this.setMode("idle");
+            this.showNotification("danger", "Recording timeout");
+        }).bind(this), this.recordTimeout);
     }
     
     stopRecording() {
         this.recorder.stopRecording();
-        this.emit("record-stop");
+        this.debug("Stop recording", "log", "LearnView");
+        clearTimeout(this.recordTimer);
+    }
+    
+    cancelRecording(callback) {
+        this.recorder.cancelRecording(callback);
+        this.debug("Cancel recording", "log", "LearnView");
+        clearTimeout(this.recordTimer);
     }
     
     textToHtml(text) {
