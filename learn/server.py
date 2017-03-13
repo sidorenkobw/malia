@@ -134,10 +134,14 @@ reactor.listenTCP(
     cyclone.web.Application([
         (r'/()', cyclone.web.StaticFileHandler,
          {"path": "learn", "default_filename": "index.html"}),
-        (r'/lib/(.*)', cyclone.web.StaticFileHandler, {"path": "public_html/lib"}),
+        (r'/([^/]+\.html)', cyclone.web.StaticFileHandler,
+         {"path": "learn"}),
+        (r'/lib/(.*)', cyclone.web.StaticFileHandler,
+         {"path": "public_html/lib"}),
         (r'/sounds', SoundListing),
         (r'/sounds/sync', SoundsSync),
-        (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler, {"path": "sounds"}),
+        (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler,
+         {"path": "sounds"}),
         (r'/train/restart', TrainRestart),
         (r'/train/logs', TrainLogs),
     ], trainRunner=trainRunner))
