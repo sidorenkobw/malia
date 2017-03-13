@@ -143,6 +143,7 @@ class LearnView extends View {
         this.isFullscreenAuto = false;
         this.recordTimeout = 10000;
         this.recordTimer = null;
+        this.uploadedWordsCounter = 0;
         
         if (malia.debugLog) {
             this.setDebugLog(malia.debugLog);
@@ -368,6 +369,9 @@ class LearnView extends View {
     onModeRecordOn() {
         this.debug("Mode record on", "log", "LearnView_ModeChange");
         
+        this.uploadedWordsCounter = 0;
+        this.updateUploadedWords();
+        
         this.$btnToggleRecording
             .removeClass("btn-primary")
             .addClass("btn-danger")
@@ -563,7 +567,13 @@ class LearnView extends View {
         
         this.getStorage().upload(record, path).then((function(snapshot) {
             this.debug("Done uploading of word: " + word + "to storage path: " + path, "log", "LearnView_Upload");
+            this.uploadedWordsCounter++;
+            this.updateUploadedWords();
         }).bind(this));
+    }
+    
+    updateUploadedWords() {
+        $(".uploadedWordsCounter").text(this.uploadedWordsCounter);
     }
     
     startRecording() {

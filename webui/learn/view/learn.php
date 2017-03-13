@@ -22,6 +22,7 @@ $this->getLayout()->js_init .= 'var app = new LearnView(malia);';
         <textarea id="learnTextEditor" class="textPanel hidden"></textarea>
     </div>
 
+    <div class="pull-right">Words uploaded: <span class="uploadedWordsCounter">0</span></div>
     <div>Incoming sound meter: <span id="meter"></span></div>
 
     <div class="controlsPanel">
