@@ -30,7 +30,7 @@ class Meter {
 }
 
 class Recorder extends EventEmitter {
-    constructor(meterElem) {
+    constructor(meterElem, successCb, errorCb) {
         super();
         
         this.mimeType = 'audio/webm;codecs=opus';
@@ -55,9 +55,24 @@ class Recorder extends EventEmitter {
                 this.mediaRecorder.onwarning = (e) => {
                     this.debug(e, "warning", "MediaRecorder");
                 };
+                
+                if (successCb) {
+                    successCb();
+                }
             }).catch((err) => {
+                var msg = "Unable to initialize MediaRecorder.";
+                
+                if (window.MediaRecorder) {
+                    msg += ' Please make sure to provide permission for recording.';
+                } else {
+                    msg += "Your browser doesn't support MediaRecorder API.";
+                }
+                
                 // TODO handle this case
                 this.debug("getUserMedia failed", "error", "MediaRecorder");
+                if (errorCb) {
+                    errorCb(msg, err);
+                }
             });
     }
 
@@ -145,29 +160,41 @@ class LearnView extends View {
         this.recordTimer = null;
         this.uploadedWordsCounter = 0;
         
+        this.initEls();
+        
         if (malia.debugLog) {
             this.setDebugLog(malia.debugLog);
         }
         
-        this.auth = malia.auth;
-        if (!this.auth) {
-            throw new Error("AuthView is not initialized");
+        if (location.protocol != "https:") {
+            var url = 'https://'+location.hostname+location.pathname;
+            this.error('HTTP protocol is not supported. Please open using HTTPS: <a href="'+url+'">'+url+'</a>');
+            return;
         }
         
-        this.recorder = new Recorder(document.querySelector("#meter"));
-        this.recorder.setDebugLog(this.debugLog);
-        this.recorder.on("word-ready", ((data) => {
-            this.uploadWord(data.word, data.blob);
-        }).bind(this));
-
-        this.initEls();
+        this.auth = malia.auth;
+        if (!this.auth) {
+            this.debug("No auth view", "log", "LearnView");
+            this.error('Internal error: unable to perform authentication.');
+            return;
+        }
+        
+        this.initRecorder();
         this.initEvents();
         this.initButtons();
         this.initKeyboardEvents();
         this.initEditor();
         this.initTextContainer();
-        
-        this.render();
+    }
+    
+    initRecorder() {
+        this.recorder = new Recorder(document.querySelector("#meter"),
+            this.render.bind(this), this.error.bind(this));
+            
+        this.recorder.setDebugLog(this.debugLog);
+        this.recorder.on("word-ready", ((data) => {
+            this.uploadWord(data.word, data.blob);
+        }).bind(this));
     }
     
     initEvents() {
@@ -648,6 +675,15 @@ class LearnView extends View {
         if ((offsetTop > height - 30) || (offsetTop < 5)) {
             this.$textContainer.animate({scrollTop: scrollTop + offsetTop - 3}, 500);
         }
+    }
+    
+    error(msg, err) {
+        var div = $("<div>")
+            .addClass("alert alert-danger")
+            .html(msg);
+            
+        this.$app.html(div);
+        this.hideOverlay();
     }
     
     render() {
