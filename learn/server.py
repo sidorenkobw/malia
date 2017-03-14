@@ -100,6 +100,10 @@ class TrainRunner(object):
             def set_model(self, model):
                 pass#sendEvent({'type': 'set_model'})
             def set_params(self, train_params):
+                if train_params['nb_sample'] == 0:
+                    # TF makes a weird failure for this
+                    raise ValueError("no samples")
+                params['nb_sample'] = train_params['nb_sample']
                 params['epoch_cur'] = 0
                 params['epoch_total'] = train_params['nb_epoch']
                 sendEvent({'type': 'set_params', 'params': params})

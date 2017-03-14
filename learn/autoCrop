@@ -1,0 +1,15 @@
+#!env/bin/python
+
+import sys
+import scipy.io.wavfile
+import numpy
+from loader import load
+from audiotransform import autoCrop
+
+inPath, outPath = sys.argv[1:]
+raw = load(inPath)
+crop = autoCrop(raw)
+print "raw %s, crop %s" % (len(raw), len(crop))
+
+
+scipy.io.wavfile.write(outPath, rate=8000, data=crop)
