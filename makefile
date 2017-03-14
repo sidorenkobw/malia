@@ -35,5 +35,4 @@ run_learn_server:
 	env/bin/python learn/server.py
 
 run_php_server:
-	cd public_html
-	$(PHP) -S localhost:9999
+	(cd public_html; $(PHP) -S localhost:9999)
