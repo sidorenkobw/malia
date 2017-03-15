@@ -12,12 +12,12 @@ $this->getLayout()->js_init .= 'var app = new LearnView(malia);';
 <div class="notifications top-right"></div>
 
 <div id="learnApp">
-    <div class="learnTextPanel">
-        <div class="auth alert alert-danger clearfix" role="alert">
-            <span class="glyphicon glyphicon-warning-sign"></span> <strong>Warning!</strong> Learning is in demo mode. Audio recording 
-                is disabled for demonstration purpose. Please sign in to start actual learning.
-        </div>
-        
+    <div class="auth alert alert-danger clearfix" role="alert">
+        <span class="glyphicon glyphicon-warning-sign"></span> <strong>Warning!</strong> Learning is in demo mode. Audio recording
+        is disabled for demonstration purpose. Please sign in to start actual learning.
+    </div>
+
+    <div class="flex">
         <div id="learnTextContainer" class="textPanel"></div>
         <textarea id="learnTextEditor" class="textPanel hidden"></textarea>
     </div>

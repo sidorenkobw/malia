@@ -83,19 +83,28 @@ body {
 
 #learnApp.fullscreen {
     background: white;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    left: 0;
+    position: absolute;
     padding: 20px;
-    max-height: calc(100vh - 40px);
+    top: 0;
+    width: 100%;
+}
+
+.fullscreen .flex {
+    display: flex;
+    flex: 1;
 }
 
 .fullscreen #learnTextContainer,
 .fullscreen #learnTextEditor {
-    height: calc(100vh - 160px);
-    min-height: 200px;
+    height: 100%;
+}
+
+.fullscreen .controlsPanel {
+    margin-bottom: 0;
 }
 
 #learnTextContainer span {
