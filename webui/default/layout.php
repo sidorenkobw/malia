@@ -94,28 +94,19 @@ $menu = array(
 
 <?php echo $this->body_before_scripts ?>
 
-<script src="<?php echo $this->cfg['libs']['jquery'] ?>"></script>
-<script src="<?php echo $this->cfg['libs']['bootstrap_js'] ?>"></script>
-
-<script src="/js/event-emitter.js?build=<?php echo $this->cfg['build'] ?>"></script>
-<script src="/lib/bootstrap-notify/js/bootstrap-notify.js?build=<?php echo $this->cfg['build'] ?>"></script>
-
-<script src="/js/view.js?build=<?php echo $this->cfg['build'] ?>"></script>
-<script src="/js/auth.js?build=<?php echo $this->cfg['build'] ?>"></script>
-
 <script>
-    $(function () {
-        var malia = {};
-        malia.cfg = {
-            'auth': <?php echo json_encode($this->cfg['auth']['federated']); ?>
-        };
-        
-        malia.debugLog = new DebugLog(malia);
-        malia.auth = new AuthView(malia);
-        
-        <?php echo $this->js_init ?>
-    });
+    var malia = {
+        cfg : {
+            build: <?php echo json_encode($this->cfg['build']); ?>,
+            auth: <?php echo json_encode($this->cfg['auth']['federated']); ?>
+        },
+        callback: function () {
+            <?php echo $this->js_init ?>
+        }
+    };
 </script>
+
+<script src="<?php echo $this->cfg['libs']['requirejs'] ?>" data-main="/js/app.js?build=<?php echo $this->cfg['build'] ?>"></script>
 
 <?php echo $this->body_scripts ?>
 

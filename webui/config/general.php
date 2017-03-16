@@ -1,7 +1,7 @@
 <?php
 
 $cfg['version'] = 0.1;
-$cfg['build'] = 13;
+$cfg['build'] = 14;
 
 // Warning. This section is exposed to js:
 $cfg['auth']['federated']['firebase'] = array(
@@ -15,3 +15,4 @@ $cfg['auth']['federated']['firebase'] = array(
 $cfg['libs']['bootstrap_js'] = '/lib/bootstrap/3.3.7/js/bootstrap.min.js';
 $cfg['libs']['bootstrap_css'] = '/lib/bootstrap/3.3.7/css/bootstrap.min.css';
 $cfg['libs']['jquery'] = '/lib/jquery/jquery-3.1.1.min.js';
+$cfg['libs']['requirejs'] = '/lib/requirejs/require-2.3.3.min.js';
