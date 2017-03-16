@@ -1,8 +1,28 @@
 <link rel="import" href="lib/bower_components/polymer/polymer.html">
 <link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
 
+<script src="lib/bower_components/wavesurfer.js/dist/wavesurfer.min.js"></script>
+
+
 <dom-module id="sounds-listing">
   <template>
+    <style>
+     #waveform {
+         position: sticky;
+         top: 10px;
+         float: right;
+         height: 128px;
+         outline: #f9d5ff 2px solid;
+         width: 40%;
+     }
+     #soundList {
+         border-collapse: collapse;
+     }
+     #soundList tr:hover td {
+         background: #f9d5ff;
+     }
+
+    </style>
     <iron-ajax id="sounds" url="sounds" auto
                last-response="{{listing}}"></iron-ajax>
     <iron-ajax id="sync" url="sounds/sync" method="PUT"></iron-ajax>
@@ -11,10 +31,11 @@
       <button on-click="resync">Resync with Firebase</button>
       {{syncStatus}}
     </div>
-    <table>
+    <div id="waveform"></div>
+    <table id="soundList">
       <template is="dom-repeat" items="{{listing.sounds}}">
-        <tr>
-          <td>[[item.path]]</td>
+        <tr on-mouseenter="loadWaveform">
+          <td on-click="loadWaveform">[[item.path]]</td>
           <td>label: ...</td>
           <td><audio src="sounds/[[item.path]]" controls
                      preload="none"></audio></td>
@@ -30,10 +51,19 @@
                this.syncStatus = "done";
                this.$.sounds.generateRequest();
            });
+           this.wavesurfer = WaveSurfer.create({
+               container: '#waveform',
+               waveColor: 'violet',
+               progressColor: 'purple'
+           });
+
        },
        resync: function() {
            this.$.sync.generateRequest();
            this.syncStatus = 'requested...';
+       },
+       loadWaveform: function(ev) {
+           this.wavesurfer.load('sounds/' + ev.model.item.path);
        }
    });
   </script>
