@@ -13,7 +13,7 @@
          float: right;
          height: 128px;
          outline: #f9d5ff 2px solid;
-         width: 40%;
+         width: 600px;
      }
      #soundList {
          border-collapse: collapse;
@@ -54,7 +54,9 @@
            this.wavesurfer = WaveSurfer.create({
                container: '#waveform',
                waveColor: 'violet',
-               progressColor: 'purple'
+               progressColor: 'purple',
+               fillParent: false,
+               minPxPerSec: 60,
            });
 
        },
