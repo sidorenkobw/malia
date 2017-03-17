@@ -1,6 +1,6 @@
 <link rel="import" href="lib/bower_components/polymer/polymer.html">
 <link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
-
+<link rel="import" href="lib/bower_components/paper-radio-group/paper-radio-group.html">
 <script src="lib/bower_components/wavesurfer.js/dist/wavesurfer.min.js"></script>
 
 
@@ -15,12 +15,6 @@
          outline: #f9d5ff 2px solid;
          width: 600px;
      }
-     #soundList {
-         border-collapse: collapse;
-     }
-     #soundList tr:hover td {
-         background: #f9d5ff;
-     }
 
     </style>
     <iron-ajax id="sounds" url="sounds" auto
@@ -32,20 +26,45 @@
       {{syncStatus}}
     </div>
     <div id="waveform"></div>
+    <div>
+      Sort by:
+      <paper-radio-group selected="{{sort}}">
+        <paper-radio-button name="word">user -> word -> time</paper-radio-button>
+        <paper-radio-button name="time">user -> time</paper-radio-button>
+      </paper-radio-group>
+    </div>
     <table id="soundList">
-      <template is="dom-repeat" items="{{listing.sounds}}">
-        <tr on-mouseenter="loadWaveform">
-          <td on-click="loadWaveform">[[item.path]]</td>
-          <td>label: ...</td>
-          <td><audio src="sounds/[[item.path]]" controls
-                     preload="none"></audio></td>
+      <thead>
+        <tr>
+          <th>user</th>
+          <th>time</th>
+          <th>word</th>
+          <th>player</th>
         </tr>
-      </template>
+      </thead>
+      <tbody>
+        <template is="dom-repeat" items="{{listing.sounds}}">
+          <tr on-mouseenter="loadWaveform" on-click="loadWaveform">
+            <td>[[item.fields.user]]</td>
+            <td>[[item.fields.iso]]</td>
+            <td>[[item.fields.word]]</td>
+            <td><audio src="sounds/[[item.path]]" controls
+                       preload="none"></audio></td>
+          </tr>
+        </template>
+      </tbody>
     </table>
   </template>
   <script>
    Polymer({
        is: "sounds-listing",
+       properties: {
+           sort: {type: String, value: 'word'},
+           listing: {type: Object, notify: true},
+       },
+       observers: [
+           'setSort(sort, listing)',
+       ],
        ready: function() {
            this.$.sync.addEventListener('response', (ev) => {
                this.syncStatus = "done";
@@ -58,7 +77,41 @@
                fillParent: false,
                minPxPerSec: 60,
            });
+       },
+       setSort: function(sort) {
+           let sortOrder = {
+               word: [{column: 0, direction: 'asc'},
+                      {column: 2, direction: 'asc'},
+                      {column: 1, direction: 'asc'}],
+               time: [{column: 0, direction: 'asc'},
+                      {column: 1, direction: 'asc'}],
+           }[sort];
 
+           var fieldName = ['user', 'milli', 'word'];
+
+           this.listing.sounds.sort(function(a, b) {
+               for (let i = 0; i < sortOrder.length; i++) {
+                   let ord = sortOrder[i];
+                   let fieldA = a.fields[fieldName[ord.column]];
+                   let fieldB = b.fields[fieldName[ord.column]];
+
+                   if ((ord.direction == 'asc' && fieldA > fieldB) ||
+                       (ord.direction == 'desc' && fieldA < fieldB)) {
+                       return 1;
+                   }
+
+                   if ((ord.direction == 'asc' && fieldA < fieldB) ||
+                       (ord.direction == 'desc' && fieldA > fieldB)) {
+                       return -1;
+                   }
+               }
+               return 0;
+           }.bind(this));
+
+           // polymer's not seeing the sort call :(
+           var freshSounds = this.listing.sounds;
+           this.set('listing.sounds', []);
+           this.set('listing.sounds', freshSounds);
        },
        resync: function() {
            this.$.sync.generateRequest();

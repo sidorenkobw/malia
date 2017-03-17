@@ -1,7 +1,8 @@
 """
 Web server for driving training and testing remotely.
 """
-import sys, time, socket, json, traceback
+from __future__ import division
+import sys, time, socket, json, traceback, urllib, datetime
 import cyclone.web, cyclone.sse
 from twisted.internet import reactor, defer, task
 from twisted.python import log
@@ -21,11 +22,38 @@ def _default(obj):
 _enc = json.JSONEncoder(default=_default)
 encodeJsonIncludingNumpyTypes = _enc.encode
 
+userForId = {
+    '13EubbAsOYgy3eZX4LAHsB5Hzq72': 'donna',
+    '8WO9WnJj80SP6WRdbIZh4IxgPP82': 'drewpca',
+    '4WGnHLHt9CbiOdaqOVAJGzbW2QP2': '4W?',
+    '4GGUPEPZYNahAwZpQSG6n4QIR913': '4G?',
+}
+
+def soundFields(segments):
+    d = {}
+    if segments[0] == 'incoming':
+        if len(segments) > 1:
+            d['user'] = userForId.get(segments[1], segments[1])
+        if len(segments) > 2:
+            d['word'] = urllib.unquote(segments[2])
+        if segments[2].endswith('.webm'):
+            # old format
+            d['word'], m = segments[2].split('_', 1)
+            d['milli'] = int(m.split('.')[0])
+        elif len(segments) > 3:
+            d['milli'] = int(segments[3].replace('.webm', ''))
+        if 'milli' in d:
+            d['iso'] = datetime.datetime.fromtimestamp(d['milli'] / 1000).isoformat('T').split('.')[0]
+    return d
+
 class SoundListing(cyclone.web.RequestHandler):
     def get(self):
         top = FilePath('sounds')
         self.write({
-            'sounds': [{'path': '/'.join(p.segmentsFrom(top))} for p in sorted(top.walk()) if p.isfile()],
+            'sounds': [{
+                'path': '/'.join(p.segmentsFrom(top)),
+                'fields': soundFields(p.segmentsFrom(top)),
+            } for p in sorted(top.walk()) if p.isfile()],
             'hostname': socket.gethostname(),
         })
 
