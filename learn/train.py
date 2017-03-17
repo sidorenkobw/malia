@@ -4,27 +4,47 @@ Read audio files, output model weights file.
 from __future__ import division
 import numpy
 from twisted.python.filepath import FilePath
-
-import speechmodel
-from loader import load
 import keras.callbacks
 
+from loader import load
+from soundsdir import soundFields
 import audiotransform
+import speechmodel
 
-def _wordFromPath(p):
-    user, word, timestamp = p.path.split('/')[-3:]
-    return word
+def findSounds(words):
+    # incomplete, no user filtering
+    top = FilePath('sounds/incoming/')
+    for p in sorted(top.walk()):
+        if p.isfile():
+            word = soundFields(p)['word']
+            if word not in words:
+                continue
+            yield p.path
+
+def sampleSet1():
+    return [
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/it/1489522177647.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/it/1489522238741.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/i/1489522116257.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/i/1489522328266.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/going/1489522088184.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/going/1489522204611.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/be/1489522202388.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/be/1489522083075.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/and/1489522113166.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/and/1489522156503.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/and/1489522192902.webm',
+        'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/and/1489522247265.webm',
+        ]
 
 def train(callback=None, out_weights='weights.h5'):
     reload(audiotransform)
     reload(speechmodel)
 
-    words = 'angeles  be  going  los  malia  on  recording  start  to  will add  asdf  click  df  edit  sadf  sdf  text  to  your click  edit test'.split()
-    words = 'click text edit'.split()
-
-    repeat = 20
-    goalSize = 10000 # samples after padding
-    embedSize = 30
+    hz = 6000
+    repeat = 50
+    goalSize = 30000 # samples after padding
+    embedSize = 10
 
     model = speechmodel.makeModel()
 
@@ -32,28 +52,27 @@ def train(callback=None, out_weights='weights.h5'):
                   optimizer='rmsprop',
                   metrics=['accuracy'])
 
-    top = FilePath('sounds/incoming/')
     paths = []
-    for p in sorted(top.walk()):
-        if p.isfile():
-            word = _wordFromPath(p)
-            if word not in words:
-                continue
-            try:
-                raw = load(p)
-                crop = audiotransform.autoCrop(raw, rate=8000)
-                audiotransform.randomPad(crop, goalSize) # must not error
-                print 'using %s cropped to %s samples' % (p, len(crop))
-            except audiotransform.TooQuiet:
-                print '%s too quiet' % p
-                continue
-            paths.append(p)
+    words = []
+    for p in sampleSet1(): # or findSounds(words)
+        try:
+            raw = load(p, hz=hz)
+            crop = audiotransform.autoCrop(raw, rate=hz)
+            audiotransform.randomPad(crop, goalSize) # must not error
+            print 'using %s cropped to %s samples' % (p, len(crop))
+        except audiotransform.TooQuiet:
+            print '%s too quiet' % p
+            continue
+        paths.append(p)
+        word = soundFields(p)['word']
+        if word not in words:
+            words.append(word)
 
     x = numpy.zeros((len(paths) * repeat, goalSize), dtype=numpy.float)
     y = numpy.zeros((len(paths) * repeat, embedSize), dtype=numpy.float)
 
     def embed(p, embedSize):
-        word = _wordFromPath(p)
+        word = soundFields(p)['word']
         vec = [0] * embedSize
         vec[words.index(word)] = 1
         return vec
@@ -72,13 +91,12 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=500, nb_epoch=20, validation_split=.02,
+    model.fit(x, y, batch_size=100, nb_epoch=20, validation_split=.2,
               callbacks=callbacks)
 
     model.save_weights(out_weights)
     if callback:
         callback.on_save(out_weights)
-
 
 if __name__ == '__main__':
     train()

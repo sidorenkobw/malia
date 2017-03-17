@@ -76,7 +76,17 @@
                scales: {
                    xAxes: [{
                        scaleLabel: 'epoch',
-                   }]
+                       ticks: {
+                           min: 0,
+                           suggestedMax: 25, // not working
+                       }
+                   }],
+                   yAxes: [{
+                       ticks: {
+                           min: 0,
+                           max: 1
+                       }
+                   }],
                }
            };
            // from https://bl.ocks.org/mbostock/raw/5577023/
