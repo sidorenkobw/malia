@@ -2,7 +2,7 @@
 Web server for driving training and testing remotely.
 """
 from __future__ import division
-import sys, time, socket, json, traceback, urllib, datetime
+import sys, time, socket, json, traceback, urllib, datetime, tempfile
 import cyclone.web, cyclone.sse
 from twisted.internet import reactor, defer, task
 from twisted.python import log
@@ -12,6 +12,7 @@ import numpy
 
 import train
 import keras.callbacks
+import speechmodel
 
 def _default(obj):
     if isinstance(obj, numpy.number):
@@ -78,6 +79,17 @@ class TrainRestart(cyclone.web.RequestHandler):
             self.set_status(500)
             self.write({'exc': traceback.format_exc()})
             return
+
+class ModelPlot(cyclone.web.RequestHandler):
+    def get(self):
+        reload(speechmodel)
+        model = speechmodel.makeModel()
+        out = tempfile.NamedTemporaryFile(suffix='.svg')
+        plot(model, to_file=out.name, show_shapes=True)
+
+        self.set_header('Content-Type', 'image/svg+xml')
+        with open(out.name) as o:
+            self.write(o.read())
 
 
 _logWatchers = {} # values are SSEHandler objects with sendEvent method
@@ -176,5 +188,6 @@ reactor.listenTCP(
          {"path": "sounds"}),
         (r'/train/restart', TrainRestart),
         (r'/train/logs', TrainLogs),
+        (r'/model/plot', ModelPlot),
     ], trainRunner=trainRunner))
 reactor.run()

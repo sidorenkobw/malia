@@ -3,6 +3,9 @@ NPM=npm
 NODE=nodejs
 PHP=php
 
+init_packages:
+	sudo apt-get install graphviz
+
 init_virtualenv:
 	mkdir -p env
 	$(VIRTUALENV) env
