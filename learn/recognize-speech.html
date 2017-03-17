@@ -1,0 +1,33 @@
+<link rel="import" href="lib/bower_components/polymer/polymer.html">
+<link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="recognize-speech">
+  <template>
+    <iron-ajax id="request" method="get" url="recognize"
+               last-response="{{result}}"
+               last-error="{{err}}"></iron-ajax>
+    <div><button on-click="onRec">Recognize</button></div>
+    <div>[[resultJson(result)]]</div>
+    <pre>[[err]]</pre>
+  </template>
+  <script>
+   Polymer({
+       is: "recognize-speech",
+       properties: {
+           result: {type: Object},
+       },
+       observers: [
+           'resultJson(result)'
+       ],
+       ready: function() {
+       },
+       onRec: function() {
+           this.$.request.generateRequest();
+       },
+       resultJson: function(result) {
+           return JSON.stringify(result);
+       }
+       
+   });
+  </script>
+</dom-module>

@@ -13,6 +13,8 @@ import numpy
 import train
 import keras.callbacks
 import speechmodel
+import recognize
+from loader import load
 
 def _default(obj):
     if isinstance(obj, numpy.number):
@@ -90,6 +92,18 @@ class ModelPlot(cyclone.web.RequestHandler):
         self.set_header('Content-Type', 'image/svg+xml')
         with open(out.name) as o:
             self.write(o.read())
+
+class Recognize(cyclone.web.RequestHandler):
+    def get(self):
+        try:
+            reload(recognize)
+            r = recognize.Recognizer()
+            raw = load('sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/at/1489699627642.webm', 8000)
+            out = r.recognize(raw, rate=8000)
+            self.write({'result': out})
+        except Exception:
+            traceback.print_exc()
+            raise
 
 
 _logWatchers = {} # values are SSEHandler objects with sendEvent method
@@ -192,5 +206,6 @@ reactor.listenTCP(
         (r'/train/restart', TrainRestart),
         (r'/train/logs', TrainLogs),
         (r'/model/plot', ModelPlot),
+        (r'/recognize', Recognize),
     ], trainRunner=trainRunner))
 reactor.run()
