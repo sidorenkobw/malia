@@ -56,6 +56,27 @@
     </table>
   </template>
   <script>
+
+   function multiSort(rows, sortOrder) {
+       let out = rows.slice();
+       out.sort(function(a, b) {
+           for (let i = 0; i < sortOrder.length; i++) {
+               let fieldA = a.fields[sortOrder[i]];
+               let fieldB = b.fields[sortOrder[i]];
+
+               if (fieldA > fieldB) {
+                   return 1;
+               }
+
+               if (fieldA < fieldB) {
+                   return -1;
+               }
+           }
+           return 0;
+       });
+       return out;
+   }
+
    Polymer({
        is: "sounds-listing",
        properties: {
@@ -80,38 +101,11 @@
        },
        setSort: function(sort) {
            let sortOrder = {
-               word: [{column: 0, direction: 'asc'},
-                      {column: 2, direction: 'asc'},
-                      {column: 1, direction: 'asc'}],
-               time: [{column: 0, direction: 'asc'},
-                      {column: 1, direction: 'asc'}],
+               word: ['user', 'word', 'milli'],
+               time: ['user', 'milli'],
            }[sort];
-
-           var fieldName = ['user', 'milli', 'word'];
-
-           this.listing.sounds.sort(function(a, b) {
-               for (let i = 0; i < sortOrder.length; i++) {
-                   let ord = sortOrder[i];
-                   let fieldA = a.fields[fieldName[ord.column]];
-                   let fieldB = b.fields[fieldName[ord.column]];
-
-                   if ((ord.direction == 'asc' && fieldA > fieldB) ||
-                       (ord.direction == 'desc' && fieldA < fieldB)) {
-                       return 1;
-                   }
-
-                   if ((ord.direction == 'asc' && fieldA < fieldB) ||
-                       (ord.direction == 'desc' && fieldA > fieldB)) {
-                       return -1;
-                   }
-               }
-               return 0;
-           }.bind(this));
-
-           // polymer's not seeing the sort call :(
-           var freshSounds = this.listing.sounds;
-           this.set('listing.sounds', []);
-           this.set('listing.sounds', freshSounds);
+           this.set('listing.sounds',
+                    multiSort(this.listing.sounds, sortOrder));
        },
        resync: function() {
            this.$.sync.generateRequest();
