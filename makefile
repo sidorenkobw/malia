@@ -39,3 +39,6 @@ run_learn_server:
 
 run_php_server:
 	(cd public_html; $(PHP) -S localhost:9999)
+
+record_timelapse:
+	ffmpeg -framerate .1 -f x11grab -s 1920,1080 -i :0.0+0,0 -vf settb=\(1/30\),setpts=N/TB/30 -r 30 -vcodec libx264 -crf 0 -preset ultrafast -threads 0 makeathon-timelapse-`date +%s`.mkv
