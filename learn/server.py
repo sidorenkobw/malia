@@ -4,7 +4,7 @@ Web server for driving training and testing remotely.
 from __future__ import division
 import sys, time, socket, json, traceback, urllib, datetime, tempfile
 import cyclone.web, cyclone.sse
-from twisted.internet import reactor, defer, task
+from twisted.internet import reactor
 from twisted.python import log
 from twisted.python.filepath import FilePath
 from twisted.internet import protocol
@@ -93,7 +93,7 @@ class ModelPlot(cyclone.web.RequestHandler):
 
 
 _logWatchers = {} # values are SSEHandler objects with sendEvent method
-        
+
 class TrainLogs(cyclone.sse.SSEHandler):
     def bind(self):
         self.key = time.time()
@@ -104,11 +104,11 @@ class TrainLogs(cyclone.sse.SSEHandler):
         self.sendEvent(event='clear', message='')
         for (ev, msg) in self.settings.trainRunner.recentLogs:
             self.sendEvent(event=ev, message=msg)
-        
+
     def unbind(self):
         del _logWatchers[self.key]
 
-        
+
 class TrainRunner(object):
     def __init__(self):
         self.recentLogs = []
@@ -120,7 +120,7 @@ class TrainRunner(object):
         for lw in _logWatchers.values():
             lw.sendEvent(event=event, message=message)
             lw.transport.doWrite()
-        
+
     def restart(self):
         sendEvent = lambda d: self.sendEvent('callback', d)
         params = {
@@ -166,7 +166,7 @@ class TrainRunner(object):
                 sendEvent({'type': 'save', 'path': path})
         reload(train)
         train.train(out_weights='weights.h5', callback=Cb())
-        
+
     def cancel(self):
         raise
 
@@ -184,6 +184,9 @@ reactor.listenTCP(
          {"path": "public_html/lib"}),
         (r'/sounds', SoundListing),
         (r'/sounds/sync', SoundsSync),
+        # bug: fails to fetch
+        # sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/i%27m/1489522158103.webm
+        # (with %27 in it) even though the file has that name.
         (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler,
          {"path": "sounds"}),
         (r'/train/restart', TrainRestart),

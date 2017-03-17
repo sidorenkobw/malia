@@ -24,7 +24,7 @@ def autoCrop(raw, rate=8000, marginSec=.1):
 
 def randomPad(clip, goalSize=20000, path='<unknown>'):
     if len(clip) > goalSize:
-        print '%s too long, cropping' % path
+        print '%s too long (%s), cropping' % (path, len(clip))
         return clip[:goalSize]
     out = numpy.zeros((goalSize,), dtype=numpy.uint8)
     pad = random.randrange(goalSize - len(clip))
