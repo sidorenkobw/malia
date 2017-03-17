@@ -59,8 +59,10 @@ def train(callback=None, out_weights='weights.h5'):
         return vec
 
     for row, p in enumerate(paths * repeat):
-        x[row,:] = audiotransform.randomPad(audiotransform.autoCrop(load(p)),
-                                            goalSize, path=p)
+        x[row,:] = audiotransform.randomScale(
+            audiotransform.randomPad(
+                audiotransform.autoCrop(load(p, hz=hz), rate=hz),
+                goalSize, path=p))
         y[row,:] = embed(p, embedSize)
         if callback:
             callback.loaded_sound(row, len(paths) * repeat)

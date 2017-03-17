@@ -30,3 +30,8 @@ def randomPad(clip, goalSize=20000, path='<unknown>'):
     pad = random.randrange(goalSize - len(clip))
     out[pad:pad+len(clip)] = clip
     return out
+
+def randomScale(clip, lo=.2, hi=2):
+    scl = lo + random.random() * (hi - lo)
+    clip = numpy.clip((clip.astype(numpy.int16) - 128) * scl, -127, 128)
+    return (clip + 128).astype(numpy.uint8)
