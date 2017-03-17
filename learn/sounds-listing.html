@@ -36,6 +36,7 @@
     <table id="soundList">
       <thead>
         <tr>
+          <th></th>
           <th>user</th>
           <th>time</th>
           <th>word</th>
@@ -45,6 +46,7 @@
       <tbody>
         <template is="dom-repeat" items="{{listing.sounds}}">
           <tr on-mouseenter="loadWaveform" on-click="loadWaveform">
+            <td><a href="sounds/[[item.path]]">[path]</a></td>
             <td>[[item.fields.user]]</td>
             <td>[[item.fields.iso]]</td>
             <td>[[item.fields.word]]</td>
