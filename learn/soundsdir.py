@@ -3,8 +3,8 @@ import urllib, datetime
 userForId = {
     '13EubbAsOYgy3eZX4LAHsB5Hzq72': 'donna',
     '8WO9WnJj80SP6WRdbIZh4IxgPP82': 'drewpca',
-    '4WGnHLHt9CbiOdaqOVAJGzbW2QP2': '4W?',
-    '4GGUPEPZYNahAwZpQSG6n4QIR913': '4G?',
+    '4WGnHLHt9CbiOdaqOVAJGzbW2QP2': 'andrew',
+    '4GGUPEPZYNahAwZpQSG6n4QIR913': 'dave',
 }
 
 def soundFields(p):
