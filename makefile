@@ -4,7 +4,7 @@ NODE=nodejs
 PHP=php
 
 init_packages:
-	sudo apt-get install graphviz python-virtualenv npm ffmpeg
+	sudo apt-get install graphviz python-virtualenv npm ffmpeg python-dev
 
 init_virtualenv:
 	mkdir -p env
