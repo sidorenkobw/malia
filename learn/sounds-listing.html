@@ -85,55 +85,55 @@
        return out;
    }
    requirejs(['wavesurfer'], function(WaveSurfer) {
-   Polymer({
-       is: "sounds-listing",
-       properties: {
-           sort: {type: String, value: 'word'},
-           listing: {type: Object, notify: true},
-       },
-       observers: [
-           'setSort(sort, listing)',
-       ],
-       ready: function() {
-           this.checkState = {};
-           this.$.sync.addEventListener('response', (ev) => {
-               this.syncStatus = "done";
-               this.$.sounds.generateRequest();
-           });
-           this.wavesurfer = WaveSurfer.create({
-               container: '#waveform',
-               waveColor: 'violet',
-               progressColor: 'purple',
-               fillParent: false,
-               minPxPerSec: 60,
-           });
-       },
-       setSort: function(sort) {
-           let sortOrder = {
-               word: ['user', 'word', 'milli'],
-               time: ['user', 'milli'],
-           }[sort];
-           this.set('listing.sounds',
-                    multiSort(this.listing.sounds, sortOrder));
-       },
-       resync: function() {
-           this.$.sync.generateRequest();
-           this.syncStatus = 'requested...';
-       },
-       loadWaveform: function(ev) {
-           this.wavesurfer.load('sounds/' + ev.model.item.path);
-       },
-       onRowChecked: function(ev) {
-           this.checkState[ev.model.item.path] = ev.target.checked;
-           var out = [];
-           for (let [k, v] of Object.entries(this.checkState)) {
-               if (v) {
-                   out.push(k);
+       Polymer({
+           is: "sounds-listing",
+           properties: {
+               sort: {type: String, value: 'word'},
+               listing: {type: Object, notify: true},
+           },
+           observers: [
+               'setSort(sort, listing)',
+           ],
+           ready: function() {
+               this.checkState = {};
+               this.$.sync.addEventListener('response', (ev) => {
+                   this.syncStatus = "done";
+                   this.$.sounds.generateRequest();
+               });
+               this.wavesurfer = WaveSurfer.create({
+                   container: '#waveform',
+                   waveColor: 'violet',
+                   progressColor: 'purple',
+                   fillParent: false,
+                   minPxPerSec: 60,
+               });
+           },
+           setSort: function(sort) {
+               let sortOrder = {
+                   word: ['user', 'word', 'milli'],
+                   time: ['user', 'milli'],
+               }[sort];
+               this.set('listing.sounds',
+                        multiSort(this.listing.sounds, sortOrder));
+           },
+           resync: function() {
+               this.$.sync.generateRequest();
+               this.syncStatus = 'requested...';
+           },
+           loadWaveform: function(ev) {
+               this.wavesurfer.load('sounds/' + ev.model.item.path);
+           },
+           onRowChecked: function(ev) {
+               this.checkState[ev.model.item.path] = ev.target.checked;
+               var out = [];
+               for (let [k, v] of Object.entries(this.checkState)) {
+                   if (v) {
+                       out.push(k);
+                   }
                }
+               this.$.checkedPaths.innerText = out.join('\n');
            }
-           this.$.checkedPaths.innerText = out.join('\n');
-       }
-   });
+       });
    });
   </script>
 </dom-module>
