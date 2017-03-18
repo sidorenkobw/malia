@@ -84,6 +84,7 @@ define([
             this.$textContainer = $("#textContainer");
             this.$btnStartRecording = $("#btnStartRecording");
             this.$btnNext = $("#btnNextWord");
+            this.$btnClearText = $("#btnClearText");
         }
 
         initKeyboardEvents() {
@@ -94,6 +95,7 @@ define([
             this.$textContainer.on("click", this.onClickNext.bind(this));
             this.$btnStartRecording.click(this.onClickStartRecording.bind(this));
             this.$btnNext.click(this.onClickNext.bind(this));
+            this.$btnClearText.click(this.onClickClearText.bind(this));
         }
 
         getStorage() {
@@ -118,6 +120,11 @@ define([
             if (this.mode == "record") {
                 this.emit("word-next");
             }
+        }
+
+        onClickClearText(e) {
+            this.$textContainer.empty();
+            this.$btnClearText.prop("disabled", true);
         }
 
         setMode(mode) {
@@ -154,6 +161,8 @@ define([
 
             this.$btnStartRecording.removeClass("hidden");
             this.$btnNext.addClass("hidden");
+
+            this.stopRecording();
         }
 
         setFullscreen(flag) {
@@ -175,6 +184,10 @@ define([
             var word = this.words.shift();
             this.stopRecording();
             if (word) {
+                if (!this.$textContainer.text().length) {
+                    this.$btnClearText.prop("disabled", false);
+                }
+
                 this.$textContainer
                     .append($("<span>").text(word))
                     .append(" ");

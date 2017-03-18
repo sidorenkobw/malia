@@ -21,8 +21,13 @@ require(["malia", "view/speak"], function (malia, SpeakView) {
 
     <div class="controlsPanel">
         <div class="row">
-            <div class="col-xs-4 col-xs-offset-4">
-                <button id="btnStartRecording" class="btn btn-primary btn-lg" tabindex="1" title="Start/stop recording process. Keys: Ctrl + Enter to enter mode, Esc - to exit mode">
+            <div class="col-xs-4 col-xs-offset-2">
+                <button id="btnClearText" class="btn btn-danger btn-lg" disabled="disabled">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> <span class="caption hidden-xs">Clear Text</span>
+                </button>
+            </div>
+            <div class="col-xs-4">
+                <button id="btnStartRecording" class="btn btn-primary btn-lg" tabindex="1">
                     <span class="glyphicon glyphicon-ice-lolly" aria-hidden="true"></span> <span class="caption hidden-xs">Start Recording</span>
                 </button>
                 <button id="btnNextWord" class="btn btn-success btn-lg hidden" tabindex="1">
