@@ -1,7 +1,7 @@
 <?php
 
 $cfg['version'] = 0.1;
-$cfg['build'] = 15;
+$cfg['build'] = 16;
 
 // Warning. This section is exposed to js:
 $cfg['auth']['federated']['firebase'] = array(

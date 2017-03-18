@@ -84,6 +84,7 @@ define([
             this.$textContainer = $("#textContainer");
             this.$btnStartRecording = $("#btnStartRecording");
             this.$btnNext = $("#btnNextWord");
+            this.$btnClearText = $("#btnClearText");
         }
 
         initKeyboardEvents() {
@@ -94,6 +95,7 @@ define([
             this.$textContainer.on("click", this.onClickNext.bind(this));
             this.$btnStartRecording.click(this.onClickStartRecording.bind(this));
             this.$btnNext.click(this.onClickNext.bind(this));
+            this.$btnClearText.click(this.onClickClearText.bind(this));
         }
 
         getStorage() {
@@ -118,6 +120,10 @@ define([
             if (this.mode == "record") {
                 this.emit("word-next");
             }
+        }
+
+        onClickClearText(e) {
+            this.$textContainer.empty();
         }
 
         setMode(mode) {
@@ -154,6 +160,8 @@ define([
 
             this.$btnStartRecording.removeClass("hidden");
             this.$btnNext.addClass("hidden");
+
+            this.stopRecording();
         }
 
         setFullscreen(flag) {
