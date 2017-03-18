@@ -80,6 +80,11 @@ body {
     width: 100%;
 }
 
+#learnApp #textContainer,
+#learnApp #textEditor {
+    height: 300px;
+}
+
 #learnApp.fullscreen,
 #speakApp.fullscreen
 {
