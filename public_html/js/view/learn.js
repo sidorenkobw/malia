@@ -91,8 +91,8 @@ define([
 
         initEls() {
             this.$app = $("#learnApp");
-            this.$textContainer = $("#learnTextContainer");
-            this.$textEditor = $("#learnTextEditor");
+            this.$textContainer = $("#textContainer");
+            this.$textEditor = $("#textEditor");
             this.$btnRetry   = $("#btnLearnRetry");
             this.$btnToggleRecording = $("#btnLearnToggleRecording");
             this.$btnNext = $("#btnLearnNext");

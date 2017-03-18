@@ -43,7 +43,7 @@
 $menu = array(
     'home' => array('title' => 'Home', 'url' => '/'),
     'learn' => array('title' => 'Learn', 'url' => '/learn.php'),
-    'speak' => array('title' => 'Speak', 'url' => '#speak'),
+    'speak' => array('title' => 'Speak', 'url' => '/speak.php'),
     'about' => array('title' => 'About', 'url' => '#about'),
     'contact' => array('title' => 'Contact', 'url' => '#contact')
 );
