@@ -74,14 +74,15 @@ body {
 .textPanel {
     display: block;
     font-size: 30px;
-    height: 300px;
     margin-bottom: 10px;
     overflow-y: scroll;
     padding: 2px;
     width: 100%;
 }
 
-#learnApp.fullscreen {
+#learnApp.fullscreen,
+#speakApp.fullscreen
+{
     background: white;
     display: flex;
     flex-direction: column;
@@ -98,8 +99,8 @@ body {
     flex: 1;
 }
 
-.fullscreen #learnTextContainer,
-.fullscreen #learnTextEditor {
+.fullscreen #textContainer,
+.fullscreen #textEditor {
     height: 100%;
 }
 
@@ -107,12 +108,12 @@ body {
     margin-bottom: 0;
 }
 
-#learnTextContainer span {
+#textContainer span {
     border: 1px solid #efefef;
     cursor: pointer;
 }
 
-#learnTextContainer span.active {
+#textContainer span.active {
     border: 1px solid red;
 }
 
