@@ -2,7 +2,7 @@
 Web server for driving training and testing remotely.
 """
 from __future__ import division
-import sys, time, socket, json, traceback, urllib, datetime, tempfile
+import sys, time, socket, json, traceback, urllib, datetime, tempfile, os
 import cyclone.web, cyclone.sse
 from twisted.internet import reactor
 from twisted.python import log
@@ -72,18 +72,28 @@ class ModelPlot(cyclone.web.RequestHandler):
         with open(out.name) as o:
             self.write(o.read())
 
+_cacheRec = None
+_cacheRecTime = 0
+
 class Recognize(cyclone.web.RequestHandler):
     def get(self):
+        global _cacheRec, _cacheRecTime
         try:
             import speechmodel
             reload(speechmodel)
-            reload(recognize)
-            r = recognize.Recognizer()
+
+            if (_cacheRec is None or
+                os.path.getmtime('learn/recognize.py') > _cacheRecTime or
+                os.path.getmtime('weights.h5') > _cacheRecTime):
+                reload(recognize)
+                _cacheRec = recognize.Recognizer()
+                _cacheRecTime = time.time()
+
             top = FilePath('sounds')
             path = top.preauthChild(self.get_argument('path'))
             raw = load(path, speechmodel.rate)
             t1 = time.time()
-            out = r.recognize(raw)
+            out = _cacheRec.recognize(raw)
             self.set_header('Content-Type', 'application/json')
             self.write(encodeJsonIncludingNumpyTypes({
                 'result': out,
