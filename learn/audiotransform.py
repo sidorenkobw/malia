@@ -18,9 +18,14 @@ def autoCrop(raw, rate=8000, marginSec=.1):
         print 'raw %s middle %s quietThreshold %s' % (
             raw.shape, middle.shape, quietThreshold)
         raise TooQuiet()
-        
+
     return raw[marginSamples + indicesWithSound[0]:
                marginSamples + indicesWithSound[-1]]
+
+def rightPad(clip, goalSize=20000):
+    out = numpy.zeros((goalSize,), dtype=numpy.uint8)
+    out[:min(goalSize, len(clip))] = clip[:goalSize]
+    return out
 
 def randomPad(clip, goalSize=20000, path='<unknown>'):
     if len(clip) > goalSize:

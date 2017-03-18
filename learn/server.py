@@ -77,9 +77,13 @@ class Recognize(cyclone.web.RequestHandler):
         try:
             reload(recognize)
             r = recognize.Recognizer()
-            raw = load('sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/at/1489699627642.webm', 8000)
+            top = FilePath('sounds')
+            path = top.preauthChild(self.get_argument('path'))
+            raw = load(path, 8000)
+            t1 = time.time()
             out = r.recognize(raw, rate=8000)
-            self.write({'result': out})
+            self.write({'result': out,
+                        'ms': round(1000 * (time.time() - t1), 1)})
         except Exception:
             traceback.print_exc()
             raise
@@ -155,8 +159,9 @@ class TrainRunner(object):
                 params['acc'] = logs['acc']
                 params['loss'] = logs['loss']
                 sendEvent({'params': params})
-            def on_save(self, path):
-                sendEvent({'type': 'save', 'path': path})
+            def on_save(self, path, fileSize):
+                sendEvent({'type': 'save', 'path': path,
+                           'fileSize': fileSize})
         reload(train)
         train.train(out_weights='weights.h5', callback=Cb())
 

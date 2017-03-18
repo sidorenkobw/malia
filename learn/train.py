@@ -2,9 +2,11 @@
 Read audio files, output model weights file.
 """
 from __future__ import division
+import os
 import numpy
 from twisted.python.filepath import FilePath
 import keras.callbacks
+from keras.utils import np_utils
 
 from loader import load
 from soundsdir import soundFields
@@ -71,18 +73,13 @@ def train(callback=None, out_weights='weights.h5'):
     x = numpy.zeros((len(paths) * repeat, goalSize), dtype=numpy.float)
     y = numpy.zeros((len(paths) * repeat, embedSize), dtype=numpy.float)
 
-    def embed(p, embedSize):
-        word = soundFields(p)['word']
-        vec = [0] * embedSize
-        vec[words.index(word)] = 1
-        return vec
-
     for row, p in enumerate(paths * repeat):
         x[row,:] = audiotransform.randomScale(
             audiotransform.randomPad(
                 audiotransform.autoCrop(load(p, hz=hz), rate=hz),
                 goalSize, path=p))
-        y[row,:] = embed(p, embedSize)
+        y[row,:] = np_utils.to_categorical(words.index(soundFields(p)['word']),
+                                           embedSize)
         if callback:
             callback.loaded_sound(row, len(paths) * repeat)
 
@@ -96,7 +93,7 @@ def train(callback=None, out_weights='weights.h5'):
 
     model.save_weights(out_weights)
     if callback:
-        callback.on_save(out_weights)
+        callback.on_save(out_weights, fileSize=os.path.getsize(out_weights))
 
 if __name__ == '__main__':
     train()
