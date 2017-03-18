@@ -20,7 +20,7 @@ define([
             /* idle|record|edit */
             this.mode = "idle";
             this.isFullscreen = false;
-            this.recordTimeout = 10000;
+            this.recordTimeout = 15000;
             this.recordTimer = null;
 
             this.initEls();
