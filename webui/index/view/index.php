@@ -10,11 +10,13 @@
 <div class="row marketing">
     <div class="col-sm-6">
         <h4>Learning</h4>
-        <p>This app is able to learn how you individually pronounce words, so that it can better comprehend what you are saying, in order to inform people around you of what you are saying. 
+        <p>This app is able to learn how you individually pronounce words, so that it can better comprehend what you are saying.
+
 </p>
 
         <h4>Speech processing</h4>
-        <p>After learning the app will be able to convert your speech to text and read it.</p>
+        <p>Once the system know how you articulate words, it will take what you say and translate it into speech or text In order to inform people around you of your words.
+</p>
     </div>
 
     <div class="col-sm-6">
