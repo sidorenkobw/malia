@@ -11,7 +11,7 @@ from twisted.internet import protocol
 import numpy
 
 import keras.callbacks
-from keras.utils.visualize_util import plot
+from keras.utils.vis_utils import plot_model
 
 import train
 from soundsdir import soundFields
@@ -66,7 +66,7 @@ class ModelPlot(cyclone.web.RequestHandler):
         reload(speechmodel)
         model = speechmodel.makeModel()
         out = tempfile.NamedTemporaryFile(suffix='.svg')
-        plot(model, to_file=out.name, show_shapes=True)
+        plot_model(model, to_file=out.name, show_shapes=True)
 
         self.set_header('Content-Type', 'image/svg+xml')
         with open(out.name) as o:
@@ -137,12 +137,12 @@ class TrainRunner(object):
             def set_model(self, model):
                 pass#sendEvent({'type': 'set_model'})
             def set_params(self, train_params):
-                if train_params['nb_sample'] == 0:
+                if train_params['samples'] == 0:
                     # TF makes a weird failure for this
                     raise ValueError("no samples")
-                params['nb_sample'] = train_params['nb_sample']
+                params['nb_sample'] = train_params['samples']
                 params['epoch_cur'] = 0
-                params['epoch_total'] = train_params['nb_epoch']
+                params['epoch_total'] = train_params['epochs']
                 sendEvent({'type': 'set_params', 'params': params})
             def on_train_begin(self, logs=None):
                 sendEvent({'type': 'train_begin'})

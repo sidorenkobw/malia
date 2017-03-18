@@ -90,7 +90,7 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=100, nb_epoch=20, validation_split=.0,
+    model.fit(x, y, batch_size=100, epochs=20, validation_split=.0,
               shuffle=True,
               callbacks=callbacks)
 
