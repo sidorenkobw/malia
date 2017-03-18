@@ -117,7 +117,7 @@ class TrainRunner(object):
 
     def sendEvent(self, event, messageDict):
         message = encodeJsonIncludingNumpyTypes(messageDict)
-        self.recentLogs = self.recentLogs[-100:] + [(event, message)]
+        self.recentLogs = self.recentLogs[-500:] + [(event, message)]
         for lw in _logWatchers.values():
             lw.sendEvent(event=event, message=message)
             lw.transport.doWrite()

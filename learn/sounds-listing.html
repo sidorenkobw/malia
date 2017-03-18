@@ -14,6 +14,9 @@
          height: 128px;
          outline: #f9d5ff 2px solid;
          width: 600px;
+
+         z-index: 2;
+         background: rgba(253, 253, 253, 0.85);
      }
 
     </style>
@@ -33,6 +36,9 @@
         <paper-radio-button name="time">user -> time</paper-radio-button>
       </paper-radio-group>
     </div>
+    <div>
+      Checked paths:
+      <textarea id="checkedPaths"></textarea>
     <table id="soundList">
       <thead>
         <tr>
@@ -46,7 +52,9 @@
       <tbody>
         <template is="dom-repeat" items="{{listing.sounds}}">
           <tr on-mouseenter="loadWaveform" on-click="loadWaveform">
-            <td><a href="sounds/[[item.path]]">[path]</a></td>
+            <td>
+              <input type="checkbox" on-change="onRowChecked"> 
+              <a href="sounds/[[item.path]]">[path]</a></td>
             <td>[[item.fields.user]]</td>
             <td>[[item.fields.iso]]</td>
             <td>[[item.fields.word]]</td>
@@ -89,6 +97,7 @@
            'setSort(sort, listing)',
        ],
        ready: function() {
+           this.checkState = {};
            this.$.sync.addEventListener('response', (ev) => {
                this.syncStatus = "done";
                this.$.sounds.generateRequest();
@@ -115,6 +124,16 @@
        },
        loadWaveform: function(ev) {
            this.wavesurfer.load('sounds/' + ev.model.item.path);
+       },
+       onRowChecked: function(ev) {
+           this.checkState[ev.model.item.path] = ev.target.checked;
+           var out = [];
+           for (let [k, v] of Object.entries(this.checkState)) {
+               if (v) {
+                   out.push(k);
+               }
+           }
+           this.$.checkedPaths.innerText = out.join('\n');
        }
    });
   </script>
