@@ -2,11 +2,13 @@
 Read audio files, output model weights file.
 """
 from __future__ import division
-import os
+import os, json
 import numpy
 from twisted.python.filepath import FilePath
 import keras.callbacks
+import keras.optimizers
 from keras.utils import np_utils
+from python_speech_features import mfcc
 
 from loader import load
 from soundsdir import soundFields
@@ -42,25 +44,21 @@ def sampleSet1():
 def train(callback=None, out_weights='weights.h5'):
     reload(audiotransform)
     reload(speechmodel)
-
-    hz = 6000
-    repeat = 1
-    goalSize = 30000 # samples after padding
-    embedSize = 10
+    repeat = 20
 
     model = speechmodel.makeModel()
 
     model.compile(loss='mean_squared_error',
-                  optimizer='rmsprop',
+                  optimizer=keras.optimizers.RMSprop(lr=0.00001),
                   metrics=['accuracy'])
 
     paths = []
     words = []
     for p in sampleSet1(): # or findSounds(words)
         try:
-            raw = load(p, hz=hz)
-            crop = audiotransform.autoCrop(raw, rate=hz)
-            audiotransform.randomPad(crop, goalSize) # must not error
+            raw = load(p, hz=speechmodel.rate)
+            crop = audiotransform.autoCrop(raw, rate=speechmodel.rate)
+            audiotransform.randomPad(crop, speechmodel.goalSize) # must not error
             print 'using %s cropped to %s samples' % (p, len(crop))
         except audiotransform.TooQuiet:
             print '%s too quiet' % p
@@ -70,18 +68,19 @@ def train(callback=None, out_weights='weights.h5'):
         if word not in words:
             words.append(word)
 
-    x = numpy.zeros((len(paths) * repeat, goalSize), dtype=numpy.float)
-    y = numpy.zeros((len(paths) * repeat, embedSize), dtype=numpy.float)
+    x = numpy.zeros((len(paths) * repeat, speechmodel.xWidth), dtype=numpy.float)
+    y = numpy.zeros((len(paths) * repeat, speechmodel.embedSize), dtype=numpy.float)
 
     for row, p in enumerate(paths * repeat):
-        audio = load(p, hz=hz)
-        audio = audiotransform.autoCrop(audio, rate=hz)
+        audio = load(p, hz=speechmodel.rate)
+        audio = audiotransform.autoCrop(audio, rate=speechmodel.rate)
         #audio = audiotransform.rightPad(audio, goalSize)
-        audio = audiotransform.randomPad(audio, goalSize, path=p)
-        audio = audiotransform.randomScale(audio)
-        x[row,:] = audio
+        audio = audiotransform.randomPad(audio, speechmodel.goalSize, path=p)
+        #audio = audiotransform.randomScale(audio)
+        m = mfcc(audio, samplerate=speechmodel.rate)
+        x[row,:] = m.reshape((1, speechmodel.xWidth))
         y[row,:] = np_utils.to_categorical(words.index(soundFields(p)['word']),
-                                           embedSize)
+                                           speechmodel.embedSize)
         if callback:
             callback.loaded_sound(row, len(paths) * repeat)
 
@@ -90,11 +89,13 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=100, epochs=20, validation_split=.0,
+    model.fit(x, y, batch_size=100, epochs=100, validation_split=.5,
               shuffle=True,
               callbacks=callbacks)
 
     model.save_weights(out_weights)
+    with open(out_weights + '.words', 'w') as f:
+        f.write(json.dumps(words) + '\n')
     if callback:
         callback.on_save(out_weights, fileSize=os.path.getsize(out_weights))
 

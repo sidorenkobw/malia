@@ -3,12 +3,15 @@
 
 <dom-module id="rec-result">
   <template>
+    <style>
+     .right { background: #b7ecb7; }
+    </style>
     <iron-ajax id="request"
                method="get"
                url="recognize"
                last-response="{{response}}"
                last-error="{{err}}"></iron-ajax>
-    <div>[[resultJson(response)]]</div>
+    <div class$="[[color(path,response)]]">[[resultJson(response)]]</div>
   </template>
   <script>
    Polymer({
@@ -31,6 +34,14 @@
                return '...';
            }
            return `${JSON.stringify(response.result)} (${response.ms} ms)`;
+       },
+       color: function(path, response) {
+           if (response === null) {
+               return '';
+               }
+           let word = path.split("/")[2];
+           let bestMatch = response.result.split(' ')[0];
+           return word == bestMatch ? 'right' : 'wrong';
        }
    });
   </script>
@@ -59,7 +70,7 @@
       <tbody>
         <template is="dom-repeat" items="[[sounds]]">
           <tr class="resultRow">
-            <td>[[item]]</td>
+            <td>[[wordFromPath(item)]]</td>
             <td><rec-result path="[[item]]"></rec-result></td>
             <td><!-- filled in by DOM editing --></td>
           </tr>
@@ -101,6 +112,9 @@
                rr.go();
            });
        },
+       wordFromPath: function(p) {
+           return p.split("/")[2];
+       }
    });
   </script>
 </dom-module>

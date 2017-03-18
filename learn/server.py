@@ -75,15 +75,19 @@ class ModelPlot(cyclone.web.RequestHandler):
 class Recognize(cyclone.web.RequestHandler):
     def get(self):
         try:
+            import speechmodel
+            reload(speechmodel)
             reload(recognize)
             r = recognize.Recognizer()
             top = FilePath('sounds')
             path = top.preauthChild(self.get_argument('path'))
-            raw = load(path, 8000)
+            raw = load(path, speechmodel.rate)
             t1 = time.time()
-            out = r.recognize(raw, rate=8000)
-            self.write({'result': out,
-                        'ms': round(1000 * (time.time() - t1), 1)})
+            out = r.recognize(raw)
+            self.set_header('Content-Type', 'application/json')
+            self.write(encodeJsonIncludingNumpyTypes({
+                'result': out,
+                'ms': round(1000 * (time.time() - t1), 1)}))
         except Exception:
             traceback.print_exc()
             raise
