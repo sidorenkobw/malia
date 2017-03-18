@@ -44,7 +44,7 @@ def train(callback=None, out_weights='weights.h5'):
     reload(speechmodel)
 
     hz = 6000
-    repeat = 50
+    repeat = 1
     goalSize = 30000 # samples after padding
     embedSize = 10
 
@@ -74,10 +74,12 @@ def train(callback=None, out_weights='weights.h5'):
     y = numpy.zeros((len(paths) * repeat, embedSize), dtype=numpy.float)
 
     for row, p in enumerate(paths * repeat):
-        x[row,:] = audiotransform.randomScale(
-            audiotransform.randomPad(
-                audiotransform.autoCrop(load(p, hz=hz), rate=hz),
-                goalSize, path=p))
+        audio = load(p, hz=hz)
+        audio = audiotransform.autoCrop(audio, rate=hz)
+        #audio = audiotransform.rightPad(audio, goalSize)
+        audio = audiotransform.randomPad(audio, goalSize, path=p)
+        audio = audiotransform.randomScale(audio)
+        x[row,:] = audio
         y[row,:] = np_utils.to_categorical(words.index(soundFields(p)['word']),
                                            embedSize)
         if callback:
@@ -88,7 +90,8 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=100, nb_epoch=20, validation_split=.2,
+    model.fit(x, y, batch_size=100, nb_epoch=20, validation_split=.0,
+              shuffle=True,
               callbacks=callbacks)
 
     model.save_weights(out_weights)
