@@ -26,7 +26,6 @@ define([
     AuthView,
     $
 ) {
-    $.abc = 123;
     malia.debugLog = new DebugLog(malia);
     malia.auth = new AuthView(malia);
     malia.callback && malia.callback();
