@@ -69,6 +69,18 @@ def sampleSet2():
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/color/1489806878042.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/color/1489806900746.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/color/1489806920774.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806345279.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806374091.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806392615.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806410387.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806437045.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806448131.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806461334.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806479076.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806502267.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806527054.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806548987.webm',
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806566110.webm',
     ]]
 
 def train(callback=None, out_weights='weights.h5'):
@@ -97,7 +109,7 @@ def train(callback=None, out_weights='weights.h5'):
         if word not in words:
             words.append(word)
 
-    repeat = 5
+    repeat = 2
     x = numpy.zeros((len(paths) * repeat, speechmodel.xWidth), dtype=numpy.float)
     y = numpy.zeros((len(paths) * repeat, speechmodel.embedSize), dtype=numpy.float)
 
@@ -119,7 +131,7 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=100, epochs=50, validation_split=.3,
+    model.fit(x, y, batch_size=500, epochs=300, validation_split=.3,
               shuffle=True,
               callbacks=callbacks)
 
