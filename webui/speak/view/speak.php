@@ -22,7 +22,7 @@ require(["malia", "view/speak"], function (malia, SpeakView) {
     <div class="controlsPanel">
         <div class="row">
             <div class="col-xs-4 col-xs-offset-2">
-                <button id="btnClearText" class="btn btn-danger btn-lg">
+                <button id="btnClearText" class="btn btn-danger btn-lg" disabled="disabled">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> <span class="caption hidden-xs">Clear Text</span>
                 </button>
             </div>

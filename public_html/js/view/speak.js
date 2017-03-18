@@ -124,6 +124,7 @@ define([
 
         onClickClearText(e) {
             this.$textContainer.empty();
+            this.$btnClearText.prop("disabled", true);
         }
 
         setMode(mode) {
@@ -183,6 +184,10 @@ define([
             var word = this.words.shift();
             this.stopRecording();
             if (word) {
+                if (!this.$textContainer.text().length) {
+                    this.$btnClearText.prop("disabled", false);
+                }
+
                 this.$textContainer
                     .append($("<span>").text(word))
                     .append(" ");
