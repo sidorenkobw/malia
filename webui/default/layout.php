@@ -2,37 +2,37 @@
 <html lang="en">
 <head>
     <?php echo $this->head_start ?>
-    
+
     <?php echo $this->head_before_meta ?>
-    
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <?php echo $this->head_after_meta ?>
-    
+
     <title><?php echo strlen($this->title) ? $this->title : 'Malia Speech' ?></title>
 
     <?php echo $this->head_before_css ?>
-    
+
     <link href="<?php echo $this->cfg['libs']['bootstrap_css'] ?>" rel="stylesheet">
     <link href="/css/malia.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
     <link href="/lib/bootstrap-notify/css/bootstrap-notify.css?build=<?php echo $this->cfg['build'] ?>" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css">
 
     <?php echo $this->head_css ?>
-    
+
     <?php echo $this->head_after_css ?>
-    
+
     <?php echo $this->head_before_scripts ?>
-    
+
     <script src="https://www.gstatic.com/firebasejs/3.6.10/firebase.js"></script>
     <script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
-    
+
     <?php echo $this->head_scripts ?>
-    
+
     <?php echo $this->head_after_scripts ?>
-    
+
     <?php echo $this->head_end ?>
 </head>
 <body>
@@ -43,8 +43,8 @@
 $menu = array(
     'home' => array('title' => 'Home', 'url' => '/'),
     'learn' => array('title' => 'Learn', 'url' => '/learn.php'),
-    'speak' => array('title' => 'Speak', 'url' => '#speak'),
-    'about' => array('title' => 'About', 'url' => '#about'),
+    'speak' => array('title' => 'Speak', 'url' => '/speak.php'),
+    'about' => array('title' => 'About', 'url' => '/about.php'),
     'contact' => array('title' => 'Contact', 'url' => '#contact')
 );
 ?>
@@ -60,7 +60,7 @@ $menu = array(
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    
+
                     <a class="navbar-brand" href="/">
                         <span class="caption">Malia Speech</span>
                         <span class="icon glyphicon glyphicon-volume-up"></span>
@@ -82,9 +82,9 @@ $menu = array(
     </div>
 
     <div id="firebaseui-auth-container"></div>
-    
+
     <?php echo $this->contents ?>
-    
+
     <footer class="footer">
         <p>&copy; 2017 Malia Speech</p>
     </footer>

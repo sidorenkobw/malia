@@ -19,8 +19,8 @@ require(["malia", "view/learn"], function (malia, LearnView) {
     </div>
 
     <div class="flex">
-        <div id="learnTextContainer" class="textPanel"></div>
-        <textarea id="learnTextEditor" class="textPanel hidden"></textarea>
+        <div id="textContainer" class="textPanel"></div>
+        <textarea id="textEditor" class="textPanel hidden"></textarea>
     </div>
 
     <div class="pull-right">Words uploaded: <span class="uploadedWordsCounter">0</span></div>
@@ -44,7 +44,7 @@ require(["malia", "view/learn"], function (malia, LearnView) {
                 </button>
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-xs-4" style="text-align: center">
                 <button id="btnFullScreen" class="btn btn-default btn-lg" tabindex="4" title="Switch to read mode. Keys: Alt + Enter to enter or exit fullscreen mode">
