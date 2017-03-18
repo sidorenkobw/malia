@@ -25,7 +25,7 @@ update_virtualenv:
 
 sync_sound_files:
 	mkdir -p sounds
-	env/bin/gsutil rsync -d -r gs://malia-speech.appspot.com/ sounds/
+	env/bin/gsutil -m rsync -d -r gs://malia-speech.appspot.com/ sounds/
 
 update_js_packages:
 	$(NPM) install
