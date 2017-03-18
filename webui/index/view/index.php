@@ -10,7 +10,8 @@
 <div class="row marketing">
     <div class="col-sm-6">
         <h4>Learning</h4>
-        <p>App can learn how you speak clearly.</p>
+        <p>This app is able to learn how you individually pronounce words, so that it can better comprehend what you are saying, in order to inform people around you of what you are saying. 
+</p>
 
         <h4>Speech processing</h4>
         <p>After learning the app will be able to convert your speech to text and read it.</p>
