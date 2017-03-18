@@ -44,7 +44,7 @@ define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
             });
         }
 
-        startRecording(word) {
+        startRecording(callback) {
             if (!this.mediaRecorder) {
                 return;
             }
@@ -53,41 +53,23 @@ define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
                 throw new Error("Recording is in progress");
             }
 
-            this.once("file-ready", ((blob) => {
-                this.emit("word-ready", {word: word, blob: blob});
-            }));
-
             this.mediaRecorder.start(/*timeslice*/ 1000);
         }
 
-        stopRecording() {
+        stopRecording(callback) {
             if (!this.mediaRecorder) {
                 return;
             }
 
             if (!this.isRecording()) {
-                throw new Error("Recorder is not active");
-            }
-
-            this.once("data-ready", (function (data) {
-                this.emit("file-ready", data);
-            }).bind(this));
-            this.mediaRecorder.stop();
-        }
-
-        cancelRecording(callback) {
-            if (!this.mediaRecorder) {
                 return;
             }
 
-            this.off("file-ready");
-
-            if (this.isRecording()) {
-                if (callback) {
-                    this.once("stop", callback);
-                }
-                this.mediaRecorder.stop();
+            if (callback) {
+                this.once("stop", callback);
             }
+
+            this.mediaRecorder.stop();
         }
 
         isRecording() {

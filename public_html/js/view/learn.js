@@ -57,9 +57,6 @@ define([
                 this.render.bind(this), this.error.bind(this));
 
             this.recorder.setDebugLog(this.debugLog);
-            this.recorder.on("word-ready", ((data) => {
-                this.uploadWord(data.word, data.blob);
-            }).bind(this));
         }
 
         initEvents() {
@@ -476,7 +473,11 @@ define([
                 return;
             }
 
-            this.recorder.startRecording(word);
+            this.once("audio-ready", function (record) {
+                this.uploadWord(word, record);
+            }.bind(this));
+
+            this.recorder.startRecording();
             this.debug("Start recording word: " + word, "log", "LearnView");
 
             this.scrollToActiveWord();
@@ -487,13 +488,18 @@ define([
         }
 
         stopRecording() {
+            this.recorder.once("data-ready", function (blob) {
+                this.emit("audio-ready", blob);
+            }.bind(this));
+
             this.recorder.stopRecording();
             this.debug("Stop recording", "log", "LearnView");
             clearTimeout(this.recordTimer);
         }
 
         cancelRecording(callback) {
-            this.recorder.cancelRecording(callback);
+            this.off("audio-ready");
+            this.recorder.stopRecording(callback);
             this.debug("Cancel recording", "log", "LearnView");
             clearTimeout(this.recordTimer);
         }
