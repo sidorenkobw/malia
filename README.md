@@ -6,6 +6,7 @@ Tensorboard Visualization
   1. Logfile is being saved on line 130 of train.py with:
     callbacks.append(keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True))
     and the log file for each run for train is saved in 'malia/logs'.
+    -Change the epoch value in line 134 of train.py to 50 in order to make it train faster.
   2. The tensorboard is already installed in env of malia, so the command:
     env/bin/tensorboard --logdir=logs
     in the shell takes log files from the directory 'malia/logs', and visualizes on Tensorboard.
