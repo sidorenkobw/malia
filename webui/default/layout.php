@@ -45,6 +45,7 @@ $menu = array(
     'learn' => array('title' => 'Learn', 'url' => '/learn.php'),
     'speak' => array('title' => 'Speak', 'url' => '/speak.php'),
     'about' => array('title' => 'About', 'url' => '/about.php'),
+    'help' => array('title' => 'Help', 'url' => '/help.php'),
     'contact' => array('title' => 'Contact', 'url' => '#contact')
 );
 ?>
@@ -98,7 +99,10 @@ $menu = array(
     var malia = {
         cfg : {
             build: <?php echo json_encode($this->cfg['build']); ?>,
-            auth: <?php echo json_encode($this->cfg['auth']['federated']); ?>
+            auth: <?php echo json_encode($this->cfg['auth']['federated']); ?>,
+            recognizer: {
+                url: <?php echo json_encode($this->cfg['recognizer']['url']); ?>
+            }
         },
         callback: function () {
             <?php echo $this->js_init ?>

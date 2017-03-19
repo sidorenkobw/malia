@@ -2,7 +2,7 @@
 Read audio files, output model weights file.
 """
 from __future__ import division
-import os, json
+import os, json, glob
 import numpy
 from twisted.python.filepath import FilePath
 import keras.callbacks
@@ -17,12 +17,10 @@ import speechmodel
 
 def findSounds(words):
     # incomplete, no user filtering
-    top = FilePath('sounds/incoming/')
+    top = FilePath('sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/will')
     for p in sorted(top.walk()):
         if p.isfile():
-            word = soundFields(p)['word']
-            if word not in words:
-                continue
+            word = soundFields(p.path)['word']
             yield p.path
 
 def sampleSet1():
@@ -551,6 +549,9 @@ def sampleSet2():
 	'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/you/1489806242188.webm',
     ]]
 
+def sampleSet3():
+    return glob.glob('sounds/incoming/d8Lo6MJMqZOGXeGDbnHkpXzeovY2/*/*')
+
 def train(callback=None, out_weights='weights.h5'):
     reload(audiotransform)
     reload(speechmodel)
@@ -558,14 +559,19 @@ def train(callback=None, out_weights='weights.h5'):
     model = speechmodel.makeModel()
 
     model.compile(loss='mean_squared_error',
-                  optimizer=keras.optimizers.RMSprop(lr=0.000004),
+                  optimizer=keras.optimizers.Nadam(lr=0.0004, beta_1=0.9, beta_2=0.999, 							   epsilon=1e-08, schedule_decay=0.004),
                   metrics=['accuracy'])
 
     paths = []
     words = []
-    for p in sampleSet2(): # or findSounds(words)
+    for p in sampleSet3(): # or findSounds(words)
         try:
             raw = load(p, hz=speechmodel.rate)
+        except:
+            print "load failed", p
+            continue
+
+        try:
             crop = audiotransform.autoCrop(raw, rate=speechmodel.rate)
             audiotransform.randomPad(crop, speechmodel.goalSize) # must not error
             print 'using %s autocropped to %s samples' % (p, len(crop))
@@ -599,7 +605,7 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=500, epochs=300, validation_split=.3,
+    model.fit(x, y, batch_size=500, epochs=100, validation_split=.3,
               shuffle=True,
               callbacks=callbacks)
 

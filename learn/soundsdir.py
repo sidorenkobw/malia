@@ -5,13 +5,20 @@ userForId = {
     '8WO9WnJj80SP6WRdbIZh4IxgPP82': 'drewpca',
     '4WGnHLHt9CbiOdaqOVAJGzbW2QP2': 'andrew',
     '4GGUPEPZYNahAwZpQSG6n4QIR913': 'dave',
-    'd8Lo6MJMqZOGXeGDbnHkpXzeovY2': 'd8?',
+    'd8Lo6MJMqZOGXeGDbnHkpXzeovY2': 'josh-d',
+    'jsLxLbBvCcMNGN5CDeX3Rg4UFXO2': 'josh-j',
+    'KsRka2TCcsanlhZqsEY95jGbFly1': 'tablet',
+    'VWVyHKMizFNcEY1sfSJtjaFTro43': 'andy'
 }
 
 def soundFields(p):
     segments = p.split('/')
     try:
         d = {}
+
+	sound_index = segments.index('sounds')
+	segments = segments[sound_index:]
+
         if segments[0] == 'sounds':
             segments.pop(0)
         if segments[0] == 'incoming':

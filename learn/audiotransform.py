@@ -14,20 +14,20 @@ def autoCrop(raw, rate=8000, marginSec=.1):
     quietThreshold = quietSample.max() + .01
     indicesWithSound = numpy.flatnonzero(norm > quietThreshold)
 
-    if len(indicesWithSound) == 0:
+    if len(indicesWithSound) <= 100:
         print 'raw %s middle %s quietThreshold %s' % (
             raw.shape, middle.shape, quietThreshold)
         raise TooQuiet()
 
-    return raw[marginSamples + indicesWithSound[0]:
-               marginSamples + indicesWithSound[-1]]
+    return middle[max(int(indicesWithSound[0] - .25 * rate), 0):
+                  min(int(indicesWithSound[-1] + 0.25 * rate), len(middle) - 1)]
 
-def rightPad(clip, goalSize=20000):
+def rightPad(clip, goalSize=10000):
     out = numpy.zeros((goalSize,), dtype=numpy.uint8)
     out[:min(goalSize, len(clip))] = clip[:goalSize]
     return out
 
-def randomPad(clip, goalSize=20000, path='<unknown>'):
+def randomPad(clip, goalSize=10000, path='<unknown>'):
     if len(clip) > goalSize:
         print '%s too long (%s), cropping' % (path, len(clip))
         return clip[:goalSize]
@@ -36,7 +36,7 @@ def randomPad(clip, goalSize=20000, path='<unknown>'):
     out[pad:pad+len(clip)] = clip
     return out
 
-def randomScale(clip, lo=.2, hi=2):
+def randomScale(clip, lo=.6, hi=1.4):
     scl = lo + random.random() * (hi - lo)
     clip = numpy.clip((clip.astype(numpy.int16) - 128) * scl, -127, 128)
     return (clip + 128).astype(numpy.uint8)

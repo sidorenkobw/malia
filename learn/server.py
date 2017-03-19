@@ -21,9 +21,9 @@ from loader import load
 
 def _default(obj):
     if isinstance(obj, numpy.number):
-        return json.dumps(round(float(obj), ndigits=6))
+        return round(float(obj), ndigits=6)
     if isinstance(obj, FilePath):
-        return json.dumps(obj.path)
+        return obj.path
     return json.JSONEncoder.default(_enc, obj)
 _enc = json.JSONEncoder(default=_default)
 encodeJsonIncludingNumpyTypes = _enc.encode
@@ -34,7 +34,7 @@ class SoundListing(cyclone.web.RequestHandler):
         self.write({
             'sounds': [{
                 'path': '/'.join(p.segmentsFrom(top)),
-                'fields': soundFields('/'.join(p.segmentsFrom(top))),
+                'fields': soundFields('sounds/' + '/'.join(p.segmentsFrom(top))),
             } for p in sorted(top.walk()) if p.isfile()],
             'hostname': socket.gethostname(),
         })
@@ -76,11 +76,9 @@ _cacheRec = None
 _cacheRecTime = 0
 
 class Recognize(cyclone.web.RequestHandler):
-    def get(self):
+    def recognize(self, raw):
         global _cacheRec, _cacheRecTime
         try:
-            import speechmodel
-            reload(speechmodel)
 
             if (_cacheRec is None or
                 os.path.getmtime('learn/recognize.py') > _cacheRecTime or
@@ -89,9 +87,6 @@ class Recognize(cyclone.web.RequestHandler):
                 _cacheRec = recognize.Recognizer()
                 _cacheRecTime = time.time()
 
-            top = FilePath('sounds')
-            path = top.preauthChild(self.get_argument('path'))
-            raw = load(path, speechmodel.rate)
             t1 = time.time()
             out = _cacheRec.recognize(raw)
             self.set_header('Content-Type', 'application/json')
@@ -101,6 +96,26 @@ class Recognize(cyclone.web.RequestHandler):
         except Exception:
             traceback.print_exc()
             raise
+
+    def get(self):
+        reload(speechmodel)
+        top = FilePath('sounds')
+        path = top.preauthChild(self.get_argument('path'))
+        raw = load(path, speechmodel.rate)
+        self.recognize(raw)
+
+    def post(self):
+        try:
+            reload(speechmodel)
+            tf = tempfile.NamedTemporaryFile(suffix='.webm')
+            tf.write(self.request.body)
+            tf.flush()
+            raw = load(tf.name, speechmodel.rate)
+            self.recognize(raw)
+        except Exception:
+            self.set_status(500)
+            self.write({'exc': traceback.format_exc()})
+            return
 
 
 _logWatchers = {} # values are SSEHandler objects with sendEvent method
@@ -184,7 +199,7 @@ class TrainRunner(object):
 
 
 trainRunner = TrainRunner()
-#log.startLogging(sys.stderr)
+log.startLogging(sys.stderr)
 reactor.listenTCP(
     9990,
     cyclone.web.Application([
@@ -192,14 +207,14 @@ reactor.listenTCP(
          {"path": "learn", "default_filename": "index.html"}),
         (r'/([^/]+\.html)', cyclone.web.StaticFileHandler,
          {"path": "learn"}),
-        (r'/lib/(.*)', cyclone.web.StaticFileHandler,
-         {"path": "public_html/lib"}),
+        (r'/((?:lib|js)/.*)', cyclone.web.StaticFileHandler,
+         {"path": "public_html"}),
         (r'/sounds', SoundListing),
         (r'/sounds/sync', SoundsSync),
         # bug: fails to fetch
         # sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/i%27m/1489522158103.webm
         # (with %27 in it) even though the file has that name.
-        (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler,
+        (r'/sounds/(.*\.(?:webm|wav))', cyclone.web.StaticFileHandler,
          {"path": "sounds"}),
         (r'/train/restart', TrainRestart),
         (r'/train/logs', TrainLogs),

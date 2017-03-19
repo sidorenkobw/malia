@@ -2,11 +2,13 @@ define([
     "malia",
     "view",
     "recorder",
+    "view/meter/learn",
     "bootstrapnotify"
 ], function (
     malia,
     View,
     Recorder,
+    LearnMeterView,
     BootstrapNotify
 ) {
     class LearnView extends View {
@@ -32,7 +34,7 @@ define([
             }
 
             if (location.protocol != "https:") {
-                var url = location.href.replace(/^http\:/, "https\:");
+                let url = location.href.replace(/^http\:/, "https\:");
                 this.error('HTTP protocol is not supported. Please open using HTTPS: <a href="'+url+'">'+url+'</a>');
                 return;
             }
@@ -53,17 +55,14 @@ define([
         }
 
         initRecorder() {
-            this.recorder = new Recorder(document.querySelector("#meter"),
-                this.render.bind(this), this.error.bind(this));
+            this.recorder = new Recorder(this.render.bind(this), this.error.bind(this));
+            this.recorder.setMeter(new LearnMeterView($("#meter").get(0)));
 
             this.recorder.setDebugLog(this.debugLog);
-            this.recorder.on("word-ready", ((data) => {
-                this.uploadWord(data.word, data.blob);
-            }).bind(this));
         }
 
         initEvents() {
-            var events = {
+            let events = {
                 "mode": this.onChangeMode,
 
                 "mode-idle-on":  this.onModeIdleOn,
@@ -84,7 +83,7 @@ define([
                 "active-word": this.onActiveWord
             };
 
-            for (var event in events) {
+            for (let event in events) {
                 this.on(event, events[event].bind(this));
             }
         }
@@ -174,7 +173,7 @@ define([
         }
 
         onKeyPressed(e) {
-            var $target = $(e.target);
+            let $target = $(e.target);
 
             if (e.which == 27) {
                 // esc
@@ -476,7 +475,11 @@ define([
                 return;
             }
 
-            this.recorder.startRecording(word);
+            this.once("audio-ready", function (record) {
+                this.uploadWord(word, record);
+            }.bind(this));
+
+            this.recorder.startRecording();
             this.debug("Start recording word: " + word, "log", "LearnView");
 
             this.scrollToActiveWord();
@@ -487,13 +490,18 @@ define([
         }
 
         stopRecording() {
+            this.recorder.once("data-ready", function (blob) {
+                this.emit("audio-ready", blob);
+            }.bind(this));
+
             this.recorder.stopRecording();
             this.debug("Stop recording", "log", "LearnView");
             clearTimeout(this.recordTimer);
         }
 
         cancelRecording(callback) {
-            this.recorder.cancelRecording(callback);
+            this.off("audio-ready");
+            this.recorder.stopRecording(callback);
             this.debug("Cancel recording", "log", "LearnView");
             clearTimeout(this.recordTimer);
         }

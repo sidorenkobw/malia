@@ -4,6 +4,16 @@
     <title>learn</title>
     <meta charset="utf-8">
     <script src="lib/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="lib/requirejs/require-2.3.3.min.js"></script>
+    <script>
+     requirejs.config({
+         baseUrl: 'js/',
+         paths : { // relative to baseUrl
+             wavesurfer: "../lib/bower_components/wavesurfer.js/dist/wavesurfer.min",
+             Chart: "../lib/bower_components/Chart.js/dist/Chart.min",
+         },
+     });
+    </script>
     <link rel="import" href="sounds-listing.html">
     <link rel="import" href="train-model.html">
     <link rel="import" href="recognize-speech.html">

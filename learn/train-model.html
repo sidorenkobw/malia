@@ -1,7 +1,7 @@
 <link rel="import" href="lib/bower_components/polymer/polymer.html">
 <link rel="import" href="lib/bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="lib/bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="lib/bower_components/chart-elements/chart-line.html">
+
 
 <dom-module id="train-model">
   <template>
@@ -67,11 +67,20 @@
                'line', this.onLogLine.bind(this));
            this.logEvents.addEventListener(
                'callback', this.onLogCallback.bind(this));
+
+           requirejs(['Chart'], function(Chart) {
+               this.importHref(
+                   "lib/bower_components/chart-elements/chart-line.html",
+                   function() {
+                       // now you can use chart element
+                   })
+           }.bind(this));
+
        },
        resetChart: function() {
            // http://www.chartjs.org/docs/
-           Chart.defaults.global.animation.duration = 0;
            this.chartOptions = {
+               animation: { duration: 0 },
                maintainAspectRatio: false,
                scales: {
                    xAxes: [{
@@ -108,7 +117,9 @@
            this.chartData.datasets[1].data.push(params.acc);
            this.chartData.datasets[2].data.push(params.val_loss);
            this.chartData.datasets[3].data.push(params.val_acc);
-           this.$.chart.updateChart();
+           if (this.$.chart.updateChart) { // soon after page load, this is not ready
+               this.$.chart.updateChart();
+           }
        },
        onLogClear: function(ev) {
            this.lines = [];
