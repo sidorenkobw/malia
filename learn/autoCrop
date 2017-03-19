@@ -1,15 +1,28 @@
 #!env/bin/python
 
+import subprocess
 import sys
 import scipy.io.wavfile
 import numpy
 from loader import load
-from audiotransform import autoCrop
+from audiotransform import autoCrop, TooQuiet
+from train import findSounds
 
-inPath, outPath = sys.argv[1:]
-raw = load(inPath)
-crop = autoCrop(raw)
-print "raw %s, crop %s" % (len(raw), len(crop))
+outPath, = sys.argv[1:]
 
+paths = list(findSounds([]))
 
-scipy.io.wavfile.write(outPath, rate=8000, data=crop)
+print(paths)
+
+for path in paths:
+
+    try:
+	raw = load(path, hz=48000)
+	crop = autoCrop(raw, rate=48000)
+    except (TooQuiet, subprocess.CalledProcessError):
+	continue
+
+    print "raw %s, crop %s" % (len(raw), len(crop))
+    incoming_index = path.index('incoming/')
+    path = path[incoming_index+8:]
+    scipy.io.wavfile.write(outPath + path.replace(".webm", ".wav").replace("/", '_'), rate=48000, data=crop)
