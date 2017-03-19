@@ -192,8 +192,8 @@ reactor.listenTCP(
          {"path": "learn", "default_filename": "index.html"}),
         (r'/([^/]+\.html)', cyclone.web.StaticFileHandler,
          {"path": "learn"}),
-        (r'/lib/(.*)', cyclone.web.StaticFileHandler,
-         {"path": "public_html/lib"}),
+        (r'/((?:lib|js)/.*)', cyclone.web.StaticFileHandler,
+         {"path": "public_html"}),
         (r'/sounds', SoundListing),
         (r'/sounds/sync', SoundsSync),
         # bug: fails to fetch

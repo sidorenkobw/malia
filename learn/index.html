@@ -7,9 +7,10 @@
     <script src="lib/requirejs/require-2.3.3.min.js"></script>
     <script>
      requirejs.config({
-         paths : {
-             wavesurfer: "lib/bower_components/wavesurfer.js/dist/wavesurfer.min",
-             Chart: "lib/bower_components/Chart.js/dist/Chart.min",
+         baseUrl: 'js/',
+         paths : { // relative to baseUrl
+             wavesurfer: "../lib/bower_components/wavesurfer.js/dist/wavesurfer.min",
+             Chart: "../lib/bower_components/Chart.js/dist/Chart.min",
          },
      });
     </script>
