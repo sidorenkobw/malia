@@ -22,7 +22,7 @@ define(["view/meter"], function (MeterView) {
             this.historyMs = 5000;
             this.history = [];
             this.histAboveThreshold = [];
-            this.thresholdQuiet = 0;
+            this.thresholdQuiet = 1;
             this.historicalPeak = 1;
         }
 
