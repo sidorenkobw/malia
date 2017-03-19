@@ -72,7 +72,9 @@ define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
             }
 
             if (!this.isRecording()) {
-                callback();
+                if (callback) {
+                    callback();
+                }
                 return;
             }
 
