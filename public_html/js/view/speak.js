@@ -209,8 +209,8 @@ define([
             })
                 .done(function (data) {
                     this.$btnClearText.prop("disabled", false);
-                    if (data.word) {
-                        this.$textContainer.append($("<span>").text(data.word));
+                    if (data.result.word) {
+                        this.$textContainer.append($("<span>").text(data.result.word));
                         this.$textContainer.append(" ");
                     } else {
                         this.$textContainer.append("...");

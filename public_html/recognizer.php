@@ -6,5 +6,7 @@ $word = $words[array_rand($words)];
 
 header("Content-Type: application/json");
 echo json_encode(array(
-    "word" => $word
+    "result" => array(
+        "word" => $word
+    )
 ));
