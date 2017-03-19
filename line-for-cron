@@ -1,1 +1,3 @@
+# add these to 'crontab -e' of user malia
 * * * * * screen -list | grep -q malia-run || screen -d -m -S malia-run -c /home/malia/malia/screenrc.malia-run
+* * * * * cd /home/malia/malia && { git pull | grep -q 'Already up-to-date' || killall screen; }
