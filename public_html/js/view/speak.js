@@ -2,11 +2,13 @@ define([
     "malia",
     "view",
     "recorder",
+    "view/meter/speak",
     "bootstrapnotify"
 ], function (
     malia,
     View,
     Recorder,
+    SpeakMeterView,
     BootstrapNotify
 ) {
     class SpeakView extends View {
@@ -48,10 +50,14 @@ define([
 
         initRecorder() {
             this.recorder = new Recorder(
-                document.querySelector("#meter"),
                 this.render.bind(this),
                 this.error.bind(this)
             );
+
+            var meter = new SpeakMeterView($("#wave-graph").get(0));
+            meter.on("word-start", function () { console.log("word-start") }.bind(this));
+            meter.on("word-stop", function () { console.log("word-stop") }.bind(this));
+            this.recorder.setMeter(meter);
 
             this.recorder.setDebugLog(this.debugLog);
         }

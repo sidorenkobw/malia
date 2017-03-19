@@ -17,7 +17,9 @@ require(["malia", "view/speak"], function (malia, SpeakView) {
         <div id="textContainer" class="textPanel"></div>
     </div>
 
-    <div style="text-align: center;">Incoming sound meter: <span id="meter"></span></div>
+    <div id="wave-graph">
+
+    </div>
 
     <div class="controlsPanel">
         <div class="row">
