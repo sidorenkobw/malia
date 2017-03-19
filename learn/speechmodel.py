@@ -3,7 +3,7 @@ from keras.layers import Convolution2D, MaxPooling2D, Activation, Dropout, Flatt
 
 rate = 8000
 goalSize = 18000 # samples after padding
-embedSize = 13
+embedSize = 26
 numcep = 13
 mfccFrames = 2912/numcep  # function of goalSize and mfcc window settings
 xWidth = mfccFrames * numcep

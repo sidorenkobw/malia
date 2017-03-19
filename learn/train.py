@@ -586,7 +586,7 @@ def train(callback=None, out_weights='weights.h5'):
         if word not in words:
             words.append(word)
 
-    repeat = 3
+    repeat = 2
     x = numpy.zeros((len(paths) * repeat, speechmodel.xWidth), dtype=numpy.float)
     y = numpy.zeros((len(paths) * repeat, speechmodel.embedSize), dtype=numpy.float)
 
@@ -608,7 +608,7 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=500, epochs=100, validation_split=.2,
+    model.fit(x, y, batch_size=500, epochs=500, validation_split=.2,
               shuffle=True,
               callbacks=callbacks)
 
