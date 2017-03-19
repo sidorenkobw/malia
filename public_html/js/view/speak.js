@@ -15,8 +15,6 @@ define([
 
             this.cfg = malia.cfg || {};
 
-            this.words = ["Hi", "my", "name", "is", "Malia", "and", "this", "is", "how", "you", "can", "understand", "me"];
-
             /* idle|record|edit */
             this.mode = "idle";
             this.isFullscreen = false;
@@ -49,13 +47,13 @@ define([
         }
 
         initRecorder() {
-            this.recorder = new Recorder(document.querySelector("#meter"),
-                this.render.bind(this), this.error.bind(this));
+            this.recorder = new Recorder(
+                document.querySelector("#meter"),
+                this.render.bind(this),
+                this.error.bind(this)
+            );
 
             this.recorder.setDebugLog(this.debugLog);
-            this.recorder.on("word-ready", ((data) => {
-                this.uploadWord(data.word, data.blob);
-            }).bind(this));
         }
 
         initEvents() {
@@ -96,10 +94,6 @@ define([
             this.$btnStartRecording.click(this.onClickStartRecording.bind(this));
             this.$btnNext.click(this.onClickNext.bind(this));
             this.$btnClearText.click(this.onClickClearText.bind(this));
-        }
-
-        getStorage() {
-            return this.auth.getProxy();
         }
 
         onKeyPressed(e) {
@@ -181,35 +175,13 @@ define([
         }
 
         onNextWord() {
-            var word = this.words.shift();
-            this.stopRecording();
-            if (word) {
-                if (!this.$textContainer.text().length) {
-                    this.$btnClearText.prop("disabled", false);
-                }
-
-                this.$textContainer
-                    .append($("<span>").text(word))
-                    .append(" ");
-            }
-            this.startRecording();
+            this.stopRecording(function () {
+                this.startRecording();
+            }.bind(this));
         }
 
-        uploadWord(word, record) {
-            // TODO handle cancel case
-            var user = this.auth.getUser();
-
-            if (user.getRole() != "authenticated") {
-                this.showNotification("danger", "Guests are not allowed to save recordings. Record was not saved.");
-                return;
-            }
-
-            this.debug("Upload started. Word: " + word, "log", "SpeakView_Upload");
-
-            //TODO sync with words db:
-            var path = "incoming/" + this.auth.getUser().getId() + "/" + escape(word) + "/" + Date.now() + ".webm";
-
-            this.debug("Upload path: " + path, "log", "SpeakView_Upload");
+        uploadWord(record) {
+            this.debug("Upload started", "log", "SpeakView_Upload");
 
             if (!record) {
                 this.showNotification("danger", "Word was not uploaded");
@@ -219,15 +191,31 @@ define([
 
             this.debug(record, "log", "SpeakView_Upload_Start");
 
-            // this.getStorage().upload(record, path).then((function(snapshot) {
-            //     this.debug("Done uploading of word: " + word + "to storage path: " + path, "log", "SpeakView_Upload");
-            //     this.uploadedWordsCounter++;
-            //     this.updateUploadedWords();
-            // }).bind(this));
+            $.ajax({
+                method: "post",
+                url: "recognizer.php",
+                data: record,
+                processData: false,
+                contentType: false,
+            })
+                .done(function (data) {
+                    this.$btnClearText.prop("disabled", false);
+                    if (data.word) {
+                        this.$textContainer.append($("<span>").text(data.word));
+                        this.$textContainer.append(" ");
+                    } else {
+                        this.$textContainer.append("...");
+                        this.$textContainer.append(" ");
+                    }
+                    this.scrollToLastWord();
+                }.bind(this))
+                .fail(function (err) {
+                    this.showNotification("danger", "Failed to upload a file. Please check network connection");
+                }.bind(this));
         }
 
         startRecording() {
-            // this.recorder.startRecording();
+            this.recorder.startRecording();
             this.debug("Start recording", "log", "SpeakView");
 
             this.recordTimer = setTimeout((function () {
@@ -236,13 +224,21 @@ define([
             }).bind(this), this.recordTimeout);
         }
 
-        stopRecording() {
-            // this.recorder.stopRecording();
+        stopRecording(callback) {
+            this.recorder.once("data-ready", function (blob) {
+                this.uploadWord(blob);
+            }.bind(this));
+
+            this.recorder.stopRecording(callback);
             this.debug("Stop recording", "log", "SpeakView");
             clearTimeout(this.recordTimer);
         }
 
-        scrollToActiveWord() {
+        scrollToLastWord() {
+            var $el = $("#textContainer span").last();
+            if (!$el.length) {
+                return;
+            }
             $el.clearQueue();
             $el.stop();
 
