@@ -50,16 +50,17 @@ define([
 
         initRecorder() {
             this.recorder = new Recorder(
-                function () {
-                    this.setMode("record");
-                    this.render();
-                }.bind(this),
+                this.render.bind(this),
                 this.error.bind(this)
             );
 
             var meter = new SpeakMeterView($("#wave-graph").get(0));
-            meter.on("word-start", function () { console.log("word-start") }.bind(this));
-            meter.on("word-stop", function () { console.log("word-stop") }.bind(this));
+            meter.on("word-start", function () {
+                if (this.mode != "record") {
+                    this.setMode("record");
+                }
+            }.bind(this));
+            meter.on("word-stop", this.onClickNext.bind(this));
             this.recorder.setMeter(meter);
 
             this.recorder.setDebugLog(this.debugLog);
@@ -234,12 +235,25 @@ define([
         }
 
         stopRecording(callback) {
+            if (!this.recorder.isRecording()) {
+                return;
+            }
+
             this.recorder.once("data-ready", function (blob) {
                 this.uploadWord(blob);
             }.bind(this));
 
             this.recorder.stopRecording(callback);
             this.debug("Stop recording", "log", "SpeakView");
+            clearTimeout(this.recordTimer);
+        }
+
+        cancelRecording(callback) {
+            if (!this.recorder.isRecording()) {
+                return;
+            }
+            this.recorder.stopRecording(callback);
+            this.debug("Cancel recording", "log", "SpeakView");
             clearTimeout(this.recordTimer);
         }
 

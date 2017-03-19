@@ -37,8 +37,16 @@ update_bower_components:
 run_learn_server:
 	env/bin/python learn/server.py
 
-run_php_server:
+
+
+/usr/bin/php:
+	@echo One-time install of php
+	sudo apt-get --yes install php
+
+run_php_server: /usr/bin/php
 	(cd public_html; $(PHP) -S localhost:9999)
+
+
 
 record_timelapse:
 	ffmpeg -framerate .1 -f x11grab -s 1920,1080 -i :0.0+0,0 -vf settb=\(1/30\),setpts=N/TB/30 -r 30 -vcodec libx264 -crf 0 -preset ultrafast -threads 0 makeathon-timelapse-`date +%s`.mkv
