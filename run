@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /home/malia/malia
+while true; do
+    make run_learn_server
+done

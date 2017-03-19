@@ -1,0 +1,1 @@
+* * * * * screen -list | grep -q malia-run || screen -d -m -S malia-run -c /home/malia/malia/screenrc.malia-run
