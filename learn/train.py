@@ -23,6 +23,7 @@ def findSounds(words):
             word = soundFields(p.path)['word']
             yield p.path
 
+#first attempt
 def sampleSet1():
     return [
         'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/it/1489522177647.webm',
@@ -39,6 +40,7 @@ def sampleSet1():
         'sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/and/1489522247265.webm',
         ]
 
+#malia's samples from the makeathon
 def sampleSet2():
     return ['sounds/'+p for p in [
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/5th/1489805356819.webm',
@@ -549,6 +551,7 @@ def sampleSet2():
 	'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/you/1489806242188.webm',
     ]]
 
+#josh's recordings
 def sampleSet3():
     return [p for p in glob.glob('sounds/incoming/d8Lo6MJMqZOGXeGDbnHkpXzeovY2/*/*')
             if soundFields(p)['word'] in ['i', 'like', 'pizza']]
@@ -565,7 +568,7 @@ def train(callback=None, out_weights='weights.h5'):
 
     paths = []
     words = []
-    for p in sampleSet3(): # or findSounds(words)
+    for p in sampleSet2(): # or findSounds(words)
         try:
             raw = load(p, hz=speechmodel.rate)
         except:
