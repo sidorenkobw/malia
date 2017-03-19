@@ -8,11 +8,17 @@ define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
             this.mediaRecorder = null;
             this.meter = null;
             this._isRecording = false;
+            this._successCb = successCb;
+            this._errorCb = errorCb;
 
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
                 errorCb("Unable to initialize MediaRecorder. Your browser doesn't support MediaRecorder API. Please try using chrome.");
                 return;
             }
+        }
+
+        setMeter(meter) {
+            this.meter = meter;
 
             // This makes the 'allow page to record?' permission appear.
             navigator.mediaDevices.getUserMedia({"audio": true, "video": false })
@@ -35,21 +41,17 @@ define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
                         this.debug(e, "warning", "MediaRecorder");
                     };
 
-                    if (successCb) {
-                        successCb();
+                    if (this._successCb) {
+                        this._successCb();
                     }
                 }).catch((err) => {
                     // TODO handle this case
                     this.debug("getUserMedia failed", "error", "MediaRecorder");
                     this.debug(err, "error", "MediaRecorder");
-                    if (errorCb) {
-                        errorCb("Unable to initialize MediaRecorder. Please make sure to provide permission for recording.", err);
+                    if (this._errorCb) {
+                        this._errorCb("Unable to initialize MediaRecorder. Please make sure to provide permission for recording.", err);
                     }
                 });
-        }
-
-        setMeter(meter) {
-            this.meter = meter;
         }
 
         startRecording() {
