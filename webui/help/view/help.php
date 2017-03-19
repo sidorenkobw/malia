@@ -19,8 +19,7 @@
         <p>If the cats are not appearing on the screen, fully shut down the Chrome internet browser and restart it.</p>
         <p>If the recording times out on you while you are using it, please note that between every word you are given 10 seconds to say the word otherwise you will be timed out. If this is a continuous issue you are running into please get into contact with the builders of the website to get this changed. 
 </p>
-        <p></p>
-        
+       
 
     </div>
 </div>
