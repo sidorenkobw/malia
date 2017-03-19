@@ -550,7 +550,8 @@ def sampleSet2():
     ]]
 
 def sampleSet3():
-    return glob.glob('sounds/incoming/d8Lo6MJMqZOGXeGDbnHkpXzeovY2/*/*')
+    return [p for p in glob.glob('sounds/incoming/d8Lo6MJMqZOGXeGDbnHkpXzeovY2/*/*')
+            if soundFields(p)['word'] in ['i', 'like', 'pizza']]
 
 def train(callback=None, out_weights='weights.h5'):
     reload(audiotransform)
@@ -559,7 +560,7 @@ def train(callback=None, out_weights='weights.h5'):
     model = speechmodel.makeModel()
 
     model.compile(loss='mean_squared_error',
-                  optimizer=keras.optimizers.Nadam(lr=0.0004, beta_1=0.9, beta_2=0.999, 							   epsilon=1e-08, schedule_decay=0.004),
+                  optimizer=keras.optimizers.Nadam(lr=0.00002, beta_1=0.9, beta_2=0.999, 							   epsilon=1e-08, schedule_decay=0.004),
                   metrics=['accuracy'])
 
     paths = []
@@ -573,7 +574,6 @@ def train(callback=None, out_weights='weights.h5'):
 
         try:
             crop = audiotransform.autoCrop(raw, rate=speechmodel.rate)
-            audiotransform.randomPad(crop, speechmodel.goalSize) # must not error
             print 'using %s autocropped to %s samples' % (p, len(crop))
         except audiotransform.TooQuiet:
             print '%s too quiet' % p
@@ -583,7 +583,7 @@ def train(callback=None, out_weights='weights.h5'):
         if word not in words:
             words.append(word)
 
-    repeat = 2
+    repeat = 3
     x = numpy.zeros((len(paths) * repeat, speechmodel.xWidth), dtype=numpy.float)
     y = numpy.zeros((len(paths) * repeat, speechmodel.embedSize), dtype=numpy.float)
 
@@ -592,7 +592,7 @@ def train(callback=None, out_weights='weights.h5'):
         audio = audiotransform.autoCrop(audio, rate=speechmodel.rate)
         #audio = audiotransform.rightPad(audio, speechmodel.goalSize)
         audio = audiotransform.randomPad(audio, speechmodel.goalSize, path=p)
-        #audio = audiotransform.randomScale(audio)
+        audio = audiotransform.randomScale(audio)
         m = mfcc(audio, samplerate=speechmodel.rate)
         x[row,:] = m.reshape((1, speechmodel.xWidth))
         y[row,:] = np_utils.to_categorical(words.index(soundFields(p)['word']),
@@ -605,7 +605,7 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=500, epochs=100, validation_split=.3,
+    model.fit(x, y, batch_size=500, epochs=100, validation_split=.2,
               shuffle=True,
               callbacks=callbacks)
 
