@@ -2,7 +2,7 @@
 Read audio files, output model weights file.
 """
 from __future__ import division
-import os, json
+import os, json, glob
 import numpy
 from twisted.python.filepath import FilePath
 import keras.callbacks
@@ -549,6 +549,9 @@ def sampleSet2():
 	'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/you/1489806242188.webm',
     ]]
 
+def sampleSet3():
+    return glob.glob('sounds/incoming/d8Lo6MJMqZOGXeGDbnHkpXzeovY2/*/*')
+
 def train(callback=None, out_weights='weights.h5'):
     reload(audiotransform)
     reload(speechmodel)
@@ -561,9 +564,14 @@ def train(callback=None, out_weights='weights.h5'):
 
     paths = []
     words = []
-    for p in sampleSet2(): # or findSounds(words)
+    for p in sampleSet3(): # or findSounds(words)
         try:
             raw = load(p, hz=speechmodel.rate)
+        except:
+            print "load failed", p
+            continue
+
+        try:
             crop = audiotransform.autoCrop(raw, rate=speechmodel.rate)
             audiotransform.randomPad(crop, speechmodel.goalSize) # must not error
             print 'using %s autocropped to %s samples' % (p, len(crop))
