@@ -556,7 +556,7 @@ def train(callback=None, out_weights='weights.h5'):
     model = speechmodel.makeModel()
 
     model.compile(loss='mean_squared_error',
-                  optimizer=keras.optimizers.RMSprop(lr=0.000004),
+                  optimizer=keras.optimizers.Nadam(lr=0.0004, beta_1=0.9, beta_2=0.999, 							   epsilon=1e-08, schedule_decay=0.004),
                   metrics=['accuracy'])
 
     paths = []
@@ -597,7 +597,7 @@ def train(callback=None, out_weights='weights.h5'):
     if callback:
         callbacks.append(callback)
 
-    model.fit(x, y, batch_size=500, epochs=300, validation_split=.3,
+    model.fit(x, y, batch_size=500, epochs=100, validation_split=.3,
               shuffle=True,
               callbacks=callbacks)
 
