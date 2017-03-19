@@ -11,7 +11,8 @@
         <p><strong>Step 7:</strong> You are ready to start training your personal speech recognizer!!! Click “Start Recording.”</p>
 
         <p><strong>Step 8:</strong> Say only the word that is boxed in red and then click “Next Word.”</p>
-        <p><strong>Step 9:</strong> Once the next word has the red box around it, you may say it without clicking anything else and it will record the word. Please take note of the fact that the “Words uploaded:” count has in fact changed. 
+        <p><strong>Step 9:</strong> Once the next word has the red box around it, you may say it without clicking anything else and it will record the word. Please take note of the fact that the “Words uploaded:” count has in fact changed. If you find that you have said a word wrong, simply click “Retry Word” and the recorder will forget the last recording and allow you to resay the word. 
+
 </p>
         <p><strong>Step 10:</strong> If you want to skip a word and not record it, the “Next Word” key will move the red box to the next word without recording the previous word. Please take note of the fact that the “Words uploaded:” count has in fact not changed even though you have passed another word. </p>
         <p><strong>Step 11:</strong> When you get to the last word of the passage or you feel like finishing your recording session click “Stop Recording. 
