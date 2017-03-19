@@ -21,7 +21,15 @@ require(["malia", "view/speak"], function (malia, SpeakView) {
 
     <div class="controlsPanel">
         <div class="row">
-            <div class="col-xs-4 col-xs-offset-2">
+            <div class="col-xs-4">
+                <button id="btnAutoSplitOn" class="btn btn-warning btn-lg">
+                    <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> <span class="caption hidden-xs">Auto Split On</span>
+                </button>
+                <button id="btnAutoSplitOff" class="hidden btn btn-default btn-lg">
+                    <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> <span class="caption hidden-xs">Auto Split Off</span>
+                </button>
+            </div>
+            <div class="col-xs-4">
                 <button id="btnClearText" class="btn btn-danger btn-lg" disabled="disabled">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> <span class="caption hidden-xs">Clear Text</span>
                 </button>

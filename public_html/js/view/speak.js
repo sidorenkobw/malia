@@ -22,6 +22,7 @@ define([
             this.isFullscreen = false;
             this.recordTimeout = 15000;
             this.recordTimer = null;
+            this.isAutoSplit = true;
 
             this.initEls();
 
@@ -56,11 +57,19 @@ define([
 
             var meter = new SpeakMeterView($("#wave-graph").get(0));
             meter.on("word-start", function () {
+                if (!this.isAutoSplit) {
+                    return;
+                }
                 if (this.mode != "record") {
                     this.setMode("record");
                 }
             }.bind(this));
-            meter.on("word-stop", this.onClickNext.bind(this));
+            meter.on("word-stop", function () {
+                if (!this.isAutoSplit) {
+                    return;
+                }
+                this.onClickNext();
+            }.bind(this));
             this.recorder.setMeter(meter);
 
             this.recorder.setDebugLog(this.debugLog);
@@ -93,6 +102,8 @@ define([
             this.$btnStartRecording = $("#btnStartRecording");
             this.$btnNext = $("#btnNextWord");
             this.$btnClearText = $("#btnClearText");
+            this.$btnAutoSplitOn = $("#btnAutoSplitOn");
+            this.$btnAutoSplitOff = $("#btnAutoSplitOff");
         }
 
         initKeyboardEvents() {
@@ -104,6 +115,9 @@ define([
             this.$btnStartRecording.click(this.onClickStartRecording.bind(this));
             this.$btnNext.click(this.onClickNext.bind(this));
             this.$btnClearText.click(this.onClickClearText.bind(this));
+            this.$btnAutoSplitOn.click(this.onClickAutoSplitOn.bind(this));
+            this.$btnAutoSplitOff.click(this.onClickAutoSplitOff.bind(this));
+            this.updateAutoSplitButtons();
         }
 
         onKeyPressed(e) {
@@ -129,6 +143,27 @@ define([
         onClickClearText(e) {
             this.$textContainer.empty();
             this.$btnClearText.prop("disabled", true);
+        }
+
+        onClickAutoSplitOn(e) {
+            this.isAutoSplit = false;
+            this.updateAutoSplitButtons();
+        }
+
+        onClickAutoSplitOff(e) {
+            this.isAutoSplit = true;
+            this.updateAutoSplitButtons();
+        }
+
+        updateAutoSplitButtons() {
+            if (this.isAutoSplit) {
+                this.$btnAutoSplitOn.removeClass("hidden");
+                this.$btnAutoSplitOff.addClass("hidden");
+            } else {
+                this.$btnAutoSplitOn.addClass("hidden");
+                this.$btnAutoSplitOff.removeClass("hidden");
+
+            }
         }
 
         setMode(mode) {
