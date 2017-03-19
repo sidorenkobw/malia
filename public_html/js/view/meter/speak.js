@@ -13,17 +13,17 @@ define(["view/meter"], function (MeterView) {
 
             this.oldIsActivated = false;
             this.isActivated = false;
-            this.thresholdSec = .2;
+            this.thresholdSec = .2; // this much silence between words
 
             this.minCounter = 0;
 
             this.prevAvg = 0;
-            this.periodMs = 20;
-            this.historyMs = 5000;
+            this.periodMs = 30; // sampling rate
+            this.historyMs = 4000;
             this.history = [];
             this.histAboveThreshold = [];
-            this.thresholdQuiet = 1;
-            this.historicalPeak = 1;
+            this.thresholdQuiet = .3;
+            this.historicalPeak = .5;
         }
 
         start() {
@@ -39,7 +39,7 @@ define(["view/meter"], function (MeterView) {
                 return (h - 5) * (1 - (mag / this.historicalPeak));
             }.bind(this);
 
-            this.ctx.strokeStyle = '#ffaa00';
+            this.ctx.strokeStyle = '#ff0000';
             this.ctx.beginPath();
             this.ctx.moveTo(0, yFromMag(this.thresholdQuiet));
             this.ctx.lineTo(w, yFromMag(this.thresholdQuiet));
@@ -56,7 +56,7 @@ define(["view/meter"], function (MeterView) {
             });
             this.ctx.stroke();
 
-            this.ctx.strokeStyle = '#aa0000';
+            this.ctx.strokeStyle = '#ffaa55';
             x = 0;
             this.histAboveThreshold.forEach((above) => {
                 if (above) {
