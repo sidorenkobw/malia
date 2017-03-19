@@ -245,7 +245,9 @@ define([
             })
                 .done(function (data) {
                     this.$btnClearText.prop("disabled", false);
-                    if (data.result.word) {
+                    if (data.result.autoCropFailed) {
+                        // silence. append nothing.
+                    } else if (data.result.word) {
                         this.$textContainer.append($("<span>").text(data.result.word));
                         this.$textContainer.append(" ");
                     } else {
