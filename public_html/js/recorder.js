@@ -1,11 +1,12 @@
 define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
     class Recorder extends EventEmitter {
-        constructor(meterElem, successCb, errorCb) {
+        constructor(successCb, errorCb) {
             super();
 
             this.mimeType = 'audio/webm;codecs=opus';
             this.chunks = [];
             this.mediaRecorder = null;
+            this.meter = null;
             this._isRecording = false;
 
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
@@ -16,7 +17,10 @@ define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
             // This makes the 'allow page to record?' permission appear.
             navigator.mediaDevices.getUserMedia({"audio": true, "video": false })
                 .then((stream) => {
-                    new Meter(meterElem, stream)
+                    this.meter
+                        .setStream(stream)
+                        .start();
+
                     this.mediaRecorder = new MediaRecorder(stream, {mimeType: this.mimeType});
 
                     this.mediaRecorder.ondataavailable = this._onData.bind(this);
@@ -35,16 +39,20 @@ define(["event-emitter", "view/meter"], function (EventEmitter, Meter) {
                         successCb();
                     }
                 }).catch((err) => {
-                // TODO handle this case
-                this.debug("getUserMedia failed", "error", "MediaRecorder");
-                this.debug(err, "error", "MediaRecorder");
-                if (errorCb) {
-                    errorCb("Unable to initialize MediaRecorder. Please make sure to provide permission for recording.", err);
-                }
-            });
+                    // TODO handle this case
+                    this.debug("getUserMedia failed", "error", "MediaRecorder");
+                    this.debug(err, "error", "MediaRecorder");
+                    if (errorCb) {
+                        errorCb("Unable to initialize MediaRecorder. Please make sure to provide permission for recording.", err);
+                    }
+                });
         }
 
-        startRecording(callback) {
+        setMeter(meter) {
+            this.meter = meter;
+        }
+
+        startRecording() {
             if (!this.mediaRecorder) {
                 return;
             }
