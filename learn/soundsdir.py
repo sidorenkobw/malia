@@ -12,6 +12,10 @@ def soundFields(p):
     segments = p.split('/')
     try:
         d = {}
+
+	sound_index = segments.index('sounds')
+	segments = segments[sound_index:]
+
         if segments[0] == 'sounds':
             segments.pop(0)
         if segments[0] == 'incoming':

@@ -17,12 +17,10 @@ import speechmodel
 
 def findSounds(words):
     # incomplete, no user filtering
-    top = FilePath('sounds/incoming/')
+    top = FilePath('sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/will')
     for p in sorted(top.walk()):
         if p.isfile():
-            word = soundFields(p)['word']
-            if word not in words:
-                continue
+            word = soundFields(p.path)['word']
             yield p.path
 
 def sampleSet1():

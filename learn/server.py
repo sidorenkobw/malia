@@ -34,7 +34,7 @@ class SoundListing(cyclone.web.RequestHandler):
         self.write({
             'sounds': [{
                 'path': '/'.join(p.segmentsFrom(top)),
-                'fields': soundFields('/'.join(p.segmentsFrom(top))),
+                'fields': soundFields('sounds/' + '/'.join(p.segmentsFrom(top))),
             } for p in sorted(top.walk()) if p.isfile()],
             'hostname': socket.gethostname(),
         })
@@ -199,7 +199,7 @@ class TrainRunner(object):
 
 
 trainRunner = TrainRunner()
-#log.startLogging(sys.stderr)
+log.startLogging(sys.stderr)
 reactor.listenTCP(
     9990,
     cyclone.web.Application([
@@ -214,7 +214,7 @@ reactor.listenTCP(
         # bug: fails to fetch
         # sounds/incoming/13EubbAsOYgy3eZX4LAHsB5Hzq72/i%27m/1489522158103.webm
         # (with %27 in it) even though the file has that name.
-        (r'/sounds/(.*\.webm)', cyclone.web.StaticFileHandler,
+        (r'/sounds/(.*\.(?:webm|wav))', cyclone.web.StaticFileHandler,
          {"path": "sounds"}),
         (r'/train/restart', TrainRestart),
         (r'/train/logs', TrainLogs),
