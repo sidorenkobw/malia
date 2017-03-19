@@ -199,7 +199,7 @@ define([
 
             $.ajax({
                 method: "post",
-                url: "recognizer.php",
+                url: this.cfg.recognizer.url,
                 data: record,
                 processData: false,
                 contentType: false,
