@@ -46,6 +46,7 @@ define([
             this.initEvents();
             this.initButtons();
             this.initKeyboardEvents();
+            this.setMode("record");
         }
 
         initRecorder() {
