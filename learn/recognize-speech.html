@@ -65,13 +65,14 @@
     <pre>[[err.request.xhr.response.exc]]</pre>
   </template>
   <script>
-   require(['recorder'], function(Recorder) {
+   require(['recorder', 'view/meter/learn'], function(Recorder, LearnMeterView) {
        Polymer({
            is: "live-rec",
            properties: {
            },
            ready: function() {
-               this.recorder = new Recorder(this.$.meter);
+               this.recorder = new Recorder();
+               this.recorder.setMeter(new LearnMeterView(this.$.meter));
            },
            onStart: function() {
                this.recorder.startRecording();
