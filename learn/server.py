@@ -76,11 +76,9 @@ _cacheRec = None
 _cacheRecTime = 0
 
 class Recognize(cyclone.web.RequestHandler):
-    def get(self):
+    def recognize(self, raw):
         global _cacheRec, _cacheRecTime
         try:
-            import speechmodel
-            reload(speechmodel)
 
             if (_cacheRec is None or
                 os.path.getmtime('learn/recognize.py') > _cacheRecTime or
@@ -89,9 +87,6 @@ class Recognize(cyclone.web.RequestHandler):
                 _cacheRec = recognize.Recognizer()
                 _cacheRecTime = time.time()
 
-            top = FilePath('sounds')
-            path = top.preauthChild(self.get_argument('path'))
-            raw = load(path, speechmodel.rate)
             t1 = time.time()
             out = _cacheRec.recognize(raw)
             self.set_header('Content-Type', 'application/json')
@@ -101,6 +96,26 @@ class Recognize(cyclone.web.RequestHandler):
         except Exception:
             traceback.print_exc()
             raise
+
+    def get(self):
+        reload(speechmodel)
+        top = FilePath('sounds')
+        path = top.preauthChild(self.get_argument('path'))
+        raw = load(path, speechmodel.rate)
+        self.recognize(raw)
+
+    def post(self):
+        try:
+            reload(speechmodel)
+            tf = tempfile.NamedTemporaryFile(suffix='.webm')
+            tf.write(self.request.body)
+            tf.flush()
+            raw = load(tf.name, speechmodel.rate)
+            self.recognize(raw)
+        except Exception:
+            self.set_status(500)
+            self.write({'exc': traceback.format_exc()})
+            return
 
 
 _logWatchers = {} # values are SSEHandler objects with sendEvent method

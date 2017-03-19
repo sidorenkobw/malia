@@ -33,16 +33,55 @@
            if (response === null) {
                return '...';
            }
-           return `${JSON.stringify(response.result)} (${response.ms} ms)`;
+           return `${response.result.matchDisplay} (${response.ms} ms)`;
        },
        color: function(path, response) {
            if (response === null) {
                return '';
-               }
+           }
            let word = path.split("/")[2];
-           let bestMatch = response.result.split(' ')[0];
+           let bestMatch = response.result.word;
            return word == bestMatch ? 'right' : 'wrong';
        }
+   });
+  </script>
+</dom-module>
+
+<dom-module id="live-rec">
+  <template>
+    <style>
+    </style>
+    <iron-ajax id="requestPost" method="post" url="recognize"
+               last-response="{{response}}"
+               last-error="{{err}}"></iron-ajax>
+    Recognize a new recording:
+    <button on-click="onStart">Start recording audio</button>
+    <button on-click="onEnd">End recording and recognize</button>
+    <span id="meter"></span>
+    <div>{{response.result.matchDisplay}}</div>
+    <pre>[[err.request.xhr.response.exc]]</pre>
+  </template>
+  <script>
+   require(['recorder'], function(Recorder) {
+       Polymer({
+           is: "live-rec",
+           properties: {
+           },
+           ready: function() {
+               this.recorder = new Recorder(this.$.meter);
+           },
+           onStart: function() {
+               this.recorder.startRecording();
+           },
+           onEnd: function() {
+               this.recorder.once("data-ready", function (blob) {
+                   this.err = null;
+                   this.$.requestPost.body = blob;
+                   this.$.requestPost.generateRequest();
+               }.bind(this))
+               this.recorder.stopRecording();
+           },
+       });
    });
   </script>
 </dom-module>
@@ -58,6 +97,9 @@
     <iron-ajax id="request" method="get" url="recognize"
                last-response="{{result}}"
                last-error="{{err}}"></iron-ajax>
+    <live-rec></live-rec>
+    <hr>
+    <div>Recognize from disk files:</div>
     <div><button on-click="onRerun">Rerun</button></div>
     <table>
       <thead>

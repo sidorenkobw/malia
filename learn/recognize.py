@@ -24,7 +24,11 @@ class Recognizer(object):
 
         out = self.model.predict(x=m.reshape((1, speechmodel.xWidth)), verbose=1)
 
-        if max(out[0]) < .1:
-            return 'no match'
-        topPairs = sorted(zip(out[0], self.words), reverse=True)[:3]
-        return '; '.join('%s (%.1f)' % (w,s) for s,w in topPairs if s >= .1)
+        topPairs = [(score, word) for score, word in
+                    sorted(zip(out[0], self.words), reverse=True)
+                    if score >= .1][:3]
+        return {
+            'word': topPairs[0][1] if topPairs else None,
+            'matches': topPairs,
+            'matchDisplay': '; '.join('%s (%.1f)' % (w,s) for s,w in topPairs),
+            }
