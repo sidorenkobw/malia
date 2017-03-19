@@ -16,7 +16,10 @@
   <script>
    Polymer({
        is: "rec-result",
-       ready: function() { this.go(); },
+       ready: function() {
+           // Ok if there are a few rows, but don't swamp server at page load.
+           // this.go();
+       },
        go: function() {
            this.response = null;
            this.$.request.params = {'path': this.path};
@@ -292,7 +295,7 @@
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806374091.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806375232.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806392615.webm',
-        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806410387.webm'x,
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806410387.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806424797.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806437045.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/friend/1489806448131.webm',
@@ -311,7 +314,7 @@
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/grade/1489805506095.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/grade/1489805517008.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/grade/1489805528437.webm',
-        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/grade/1489805539476.webm'x,
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/grade/1489805539476.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/hi/1489805072694.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/hi/1489805084831.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/hi/1489805109791.webm',
@@ -345,7 +348,7 @@
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805684248.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805693768.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805703956.webm',
-        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805715007.webm'x,
+        'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805715007.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805724688.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805734967.webm',
         'incoming/4GGUPEPZYNahAwZpQSG6n4QIR913/i/1489805745247.webm',
