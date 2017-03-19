@@ -21,9 +21,9 @@ from loader import load
 
 def _default(obj):
     if isinstance(obj, numpy.number):
-        return json.dumps(round(float(obj), ndigits=6))
+        return round(float(obj), ndigits=6)
     if isinstance(obj, FilePath):
-        return json.dumps(obj.path)
+        return obj.path
     return json.JSONEncoder.default(_enc, obj)
 _enc = json.JSONEncoder(default=_default)
 encodeJsonIncludingNumpyTypes = _enc.encode
