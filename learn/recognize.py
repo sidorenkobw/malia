@@ -19,6 +19,7 @@ class Recognizer(object):
         self.words = json.load(open(weightsPath + '.words'))
 
     def recognize(self, newAudio):
+        newAudio = audiotransform.autoCrop(newAudio, rate=speechmodel.rate)
         pad = audiotransform.rightPad(newAudio, goalSize=speechmodel.goalSize)
         m = mfcc(pad, samplerate=speechmodel.rate)
 

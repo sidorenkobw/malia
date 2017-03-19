@@ -32,11 +32,11 @@ def randomPad(clip, goalSize=10000, path='<unknown>'):
         print '%s too long (%s), cropping' % (path, len(clip))
         return clip[:goalSize]
     out = numpy.zeros((goalSize,), dtype=numpy.uint8)
-    pad = random.randrange(goalSize - len(clip))
+    pad = random.randrange(min(100, goalSize - len(clip)))
     out[pad:pad+len(clip)] = clip
     return out
 
-def randomScale(clip, lo=.6, hi=1.4):
+def randomScale(clip, lo=.9, hi=1.1):
     scl = lo + random.random() * (hi - lo)
     clip = numpy.clip((clip.astype(numpy.int16) - 128) * scl, -127, 128)
     return (clip + 128).astype(numpy.uint8)
