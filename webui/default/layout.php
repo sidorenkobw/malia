@@ -45,6 +45,7 @@ $menu = array(
     'learn' => array('title' => 'Learn', 'url' => '/learn.php'),
     'speak' => array('title' => 'Speak', 'url' => '/speak.php'),
     'about' => array('title' => 'About', 'url' => '/about.php'),
+    'help' => array('title' => 'Help', 'url' => '/help.php'),
     'contact' => array('title' => 'Contact', 'url' => '#contact')
 );
 ?>
