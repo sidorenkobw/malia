@@ -17,9 +17,7 @@ require(["malia", "view/speak"], function (malia, SpeakView) {
         <div id="textContainer" class="textPanel"></div>
     </div>
 
-    <div id="wave-graph">
-
-    </div>
+    <div id="wave-graph"></div>
 
     <div class="controlsPanel">
         <div class="row">

@@ -46,13 +46,14 @@ define([
             this.initEvents();
             this.initButtons();
             this.initKeyboardEvents();
-
-            this.setMode("record");
         }
 
         initRecorder() {
             this.recorder = new Recorder(
-                this.render.bind(this),
+                function () {
+                    this.setMode("record");
+                    this.render();
+                }.bind(this),
                 this.error.bind(this)
             );
 
